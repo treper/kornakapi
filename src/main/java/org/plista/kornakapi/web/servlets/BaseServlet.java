@@ -9,19 +9,28 @@ import org.plista.kornakapi.web.MissingParameterException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 
 public abstract class BaseServlet extends HttpServlet {
 
+  private Components getComponents() {
+    return (Components) getServletContext().getAttribute("components");
+  }
+
+  protected File getModelDirectory() {
+    return new File(getComponents().getConfiguration().getModelDirectory());
+  }
+
   protected Recommender getRecommender(String name) {
-    return Components.instance().recommender(name);
+    return getComponents().recommender(name);
   }
 
   protected Trainer getTrainer(String name) {
-    return Components.instance().trainer(name);
+    return getComponents().trainer(name);
   }
 
   protected Storage getStorage() {
-    return Components.instance().storage();
+    return getComponents().storage();
   }
 
   protected String getParameter(HttpServletRequest request, String name, boolean required) {

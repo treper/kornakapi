@@ -3,10 +3,11 @@ package org.plista.kornakapi.core.storage;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.Preference;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 
-public interface Storage {
+public interface Storage extends Closeable {
 
   DataModel trainingData() throws IOException;
 

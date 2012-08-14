@@ -2,7 +2,7 @@ package org.plista.kornakapi.core;
 
 import org.apache.mahout.cf.taste.model.Preference;
 
-public class ReusablePreference implements Preference {
+public class MutablePreference implements Preference {
 
   private long userID;
   private long itemID;
@@ -36,6 +36,6 @@ public class ReusablePreference implements Preference {
 
   @Override
   public String toString() {
-    return "ReusablePreference{" + "userID=" + userID + ", itemID=" + itemID + ", value=" + value + '}';
+    return "MutablePreference{" + "userID=" + userID + ", itemID=" + itemID + ", value=" + value + '}';
   }
 }

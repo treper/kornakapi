@@ -1,6 +1,7 @@
 package org.plista.kornakapi.core.storage;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.hadoop.metrics2.util.TryIterator;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.model.GenericDataModel;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
@@ -8,8 +9,10 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.model.JDBCDataModel;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.apache.mahout.common.IOUtils;
+import org.plista.kornakapi.core.config.StorageConfiguration;
 
 import javax.sql.DataSource;
+import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,19 +21,20 @@ import java.util.Iterator;
 
 public class MySqlStorage implements Storage {
 
-  private final DataSource dataSource;
+  private final BasicDataSource dataSource;
   private final JDBCDataModel dataModel;
 
   private static final String IMPORT_QUERY =
       "INSERT INTO taste_preferences (user_id, item_id, preference) VALUES (?, ?, ?) " +
       "ON DUPLICATE KEY UPDATE preference = VALUES(preference)";
 
-  public MySqlStorage() {
+  public MySqlStorage(StorageConfiguration storageConf) {
+
     BasicDataSource dataSource = new BasicDataSource();
-    dataSource.setDriverClassName(com.mysql.jdbc.Driver.class.getName());
-    dataSource.setUrl("jdbc:mysql://localhost/plista");
-    dataSource.setUsername("root");
-    dataSource.setPassword("");
+    dataSource.setDriverClassName(storageConf.getJdbcDriverClass());
+    dataSource.setUrl(storageConf.getJdbcUrl());
+    dataSource.setUsername(storageConf.getUsername());
+    dataSource.setPassword(storageConf.getPassword());
 
     this.dataSource = dataSource;
     /*dataSource.setMaxActive(cfg.asInt("datasourceMaxActive"));
@@ -102,6 +106,15 @@ public class MySqlStorage implements Storage {
     } finally {
       IOUtils.quietClose(stmt);
       IOUtils.quietClose(conn);
+    }
+  }
+
+  @Override
+  public void close() throws IOException {
+    try {
+      dataSource.close();
+    } catch (SQLException e) {
+      throw new IOException("Unable to close datasource", e);
     }
   }
 }

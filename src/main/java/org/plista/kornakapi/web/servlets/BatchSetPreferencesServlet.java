@@ -6,7 +6,8 @@ import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.mahout.cf.taste.model.Preference;
-import org.plista.kornakapi.core.io.FilePreferenceIterator;
+import org.plista.kornakapi.core.io.CSVPreferenceFileIterator;
+import org.plista.kornakapi.core.io.CSVPreferenceFileIterator;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.web.Parameters;
 
@@ -42,7 +43,7 @@ public class BatchSetPreferencesServlet extends BaseServlet {
         if (Parameters.FILE.equals(item.getFieldName()) && !item.isFormField()) {
 
           in = item.openStream();
-          Iterator<Preference> preferences = new FilePreferenceIterator(in);
+          Iterator<Preference> preferences = new CSVPreferenceFileIterator(in);
 
           storage.batchSetPreferences(preferences, batchSize);
 
