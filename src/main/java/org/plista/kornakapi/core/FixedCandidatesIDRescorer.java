@@ -15,42 +15,24 @@
 
 package org.plista.kornakapi.core;
 
-import org.apache.mahout.cf.taste.model.Preference;
+import org.apache.mahout.cf.taste.impl.common.FastIDSet;
+import org.apache.mahout.cf.taste.recommender.IDRescorer;
 
-public class MutablePreference implements Preference {
+public class FixedCandidatesIDRescorer implements IDRescorer {
 
-  private long userID;
-  private long itemID;
-  private float value;
+  private final FastIDSet candidates;
 
-  public void set(long userID, long itemID, float value) {
-    this.userID = userID;
-    this.itemID = itemID;
-    setValue(value);
+  public FixedCandidatesIDRescorer(FastIDSet candidates) {
+    this.candidates = candidates;
   }
 
   @Override
-  public long getUserID() {
-    return userID;
+  public double rescore(long id, double originalScore) {
+    return originalScore;
   }
 
   @Override
-  public long getItemID() {
-    return itemID;
-  }
-
-  @Override
-  public float getValue() {
-    return value;
-  }
-
-  @Override
-  public void setValue(float value) {
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return "MutablePreference{" + "userID=" + userID + ", itemID=" + itemID + ", value=" + value + '}';
+  public boolean isFiltered(long id) {
+    return !candidates.contains(id);
   }
 }

@@ -15,42 +15,24 @@
 
 package org.plista.kornakapi.core;
 
-import org.apache.mahout.cf.taste.model.Preference;
+public class Candidate {
 
-public class MutablePreference implements Preference {
-
-  private long userID;
+  private String label;
   private long itemID;
-  private float value;
 
-  public void set(long userID, long itemID, float value) {
-    this.userID = userID;
+  public Candidate() {
+  }
+
+  public void set(String label, long itemID) {
+    this.label = label;
     this.itemID = itemID;
-    setValue(value);
   }
 
-  @Override
-  public long getUserID() {
-    return userID;
+  public String getLabel() {
+    return label;
   }
 
-  @Override
   public long getItemID() {
     return itemID;
-  }
-
-  @Override
-  public float getValue() {
-    return value;
-  }
-
-  @Override
-  public void setValue(float value) {
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return "MutablePreference{" + "userID=" + userID + ", itemID=" + itemID + ", value=" + value + '}';
   }
 }

@@ -27,15 +27,15 @@
     <servlet-class>org.plista.kornakapi.web.servlets.RecommendServlet</servlet-class>
   </servlet>
 
-  <!--filter>
-    <filter-name>BigBangFilter</filter-name>
-    <filter-class>org.plista.kornakapi.web.servlets.BigBangFilter</filter-class>
-  </filter-->
+  <servlet>
+    <servlet-name>AddCandidate</servlet-name>
+    <servlet-class>org.plista.kornakapi.web.servlets.AddCandidateServlet</servlet-class>
+  </servlet>
 
-  <!--filter-mapping>
-    <filter-name>BigBangFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping-->
+  <servlet>
+    <servlet-name>DeleteCandidate</servlet-name>
+    <servlet-class>org.plista.kornakapi.web.servlets.DeleteCandidateServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>BatchSetPreferences</servlet-name>
@@ -55,6 +55,16 @@
   <servlet-mapping>
     <servlet-name>Recommend</servlet-name>
     <url-pattern>/recommend</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>AddCandidate</servlet-name>
+    <url-pattern>/addCandidate</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>DeleteCandidate</servlet-name>
+    <url-pattern>/deleteCandidate</url-pattern>
   </servlet-mapping>
 
 </web-app>

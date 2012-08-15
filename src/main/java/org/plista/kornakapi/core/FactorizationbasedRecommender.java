@@ -1,3 +1,18 @@
+/**
+ * Copyright 2012 plista GmbH  (http://www.plista.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and limitations under the License.
+ */
+
 package org.plista.kornakapi.core;
 
 import com.google.common.base.Preconditions;
@@ -28,6 +43,8 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
   private final PersistenceStrategy persistenceStrategy;
   private final RefreshHelper refreshHelper;
 
+  private final CandidateItemsStrategy candidateItemsStrategy;
+
   private static final Logger log = LoggerFactory.getLogger(FactorizationbasedRecommender.class);
 
   public FactorizationbasedRecommender(DataModel dataModel, CandidateItemsStrategy candidateItemsStrategy,
@@ -52,6 +69,8 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
     });
     refreshHelper.addDependency(getDataModel());
     refreshHelper.addDependency(candidateItemsStrategy);
+
+    this.candidateItemsStrategy = candidateItemsStrategy;
   }
 
   private void reloadFactorization() throws TasteException {
@@ -68,13 +87,27 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
     log.debug("Recommending items for user ID '{}'", userID);
 
     PreferenceArray preferencesFromUser = getDataModel().getPreferencesFromUser(userID);
-    FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser);
+    FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser, rescorer);
 
     List<RecommendedItem> topItems = TopItems.getTopItems(howMany, possibleItemIDs.iterator(), rescorer,
-        new Estimator(userID));
+        new Estimator(userID), false);
     log.debug("Recommendations are: {}", topItems);
 
     return topItems;
+  }
+
+  @Override
+  protected FastIDSet getAllOtherItems(long userID, PreferenceArray preferencesFromUser, IDRescorer rescorer)
+  throws TasteException {
+    FastIDSet candidates = candidateItemsStrategy.getCandidateItems(userID, preferencesFromUser, getDataModel());
+
+    System.out.println(candidates.size() + " candidate items before filtering");
+
+    maybeFilterCandidateItems(rescorer, candidates);
+
+    System.out.println(candidates.size() + " candidate items after filtering");
+
+    return candidates;
   }
 
   @Override
