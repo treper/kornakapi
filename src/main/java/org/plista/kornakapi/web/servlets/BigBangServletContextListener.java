@@ -37,20 +37,29 @@ import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
 import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
+import org.plista.kornakapi.core.training.TrainAllRecommendersJob;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.web.Components;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.CronTrigger;
+import org.quartz.JobBuilder;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.DirectSchedulerFactory;
+import org.quartz.simpl.RAMJobStore;
+import org.quartz.simpl.SimpleThreadPool;
+import org.quartz.spi.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.util.Map;
 
 public class BigBangServletContextListener implements ServletContextListener {
-
-  static final String COMPONENTS_ATTRIBUTE = "components";
 
   private static final Logger log = LoggerFactory.getLogger(BigBangServletContextListener.class);
 
@@ -105,9 +114,25 @@ public class BigBangServletContextListener implements ServletContextListener {
                 factorizationbasedConf.getNumberOfIterations() });
       }
 
+      ThreadPool threadPool = new SimpleThreadPool(1, Thread.NORM_PRIORITY); threadPool.initialize();
 
-      ServletContext servletContext = event.getServletContext();
-      servletContext.setAttribute(COMPONENTS_ATTRIBUTE, new Components(conf, storage, recommenders, trainers));
+      DirectSchedulerFactory schedulerFactory = DirectSchedulerFactory.getInstance();
+      schedulerFactory.createScheduler(threadPool, new RAMJobStore());
+      Scheduler scheduler = schedulerFactory.getScheduler();
+
+      JobDetail job = JobBuilder.newJob(TrainAllRecommendersJob.class).build();
+
+      // http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger
+      CronTrigger trigger = TriggerBuilder.newTrigger()
+          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 * * ?"))
+          .build();
+
+      scheduler.scheduleJob(job, trigger);
+
+      Components.init(conf, storage, recommenders, trainers, scheduler);
+
+      scheduler.start();
+
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -115,8 +140,13 @@ public class BigBangServletContextListener implements ServletContextListener {
 
   @Override
   public void contextDestroyed(ServletContextEvent event) {
-    Components components = (Components) event.getServletContext().getAttribute(COMPONENTS_ATTRIBUTE);
+    Components components = Components.instance();
 
     Closeables.closeQuietly(components.storage());
+    try {
+      components.scheduler().shutdown();
+    } catch (SchedulerException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }

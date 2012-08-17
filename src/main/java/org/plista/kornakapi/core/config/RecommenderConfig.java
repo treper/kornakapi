@@ -15,24 +15,15 @@
 
 package org.plista.kornakapi.core.config;
 
-public class ItembasedRecommenderConfig extends RecommenderConfig {
+public abstract class RecommenderConfig {
 
-  private String similarityClass;
-  private int similarItemsPerItem;
+  private String name;
 
-  public String getSimilarityClass() {
-    return similarityClass;
+  public String getName() {
+    return name;
   }
 
-  public void setSimilarityClass(String similarityClass) {
-    this.similarityClass = similarityClass;
-  }
-
-  public int getSimilarItemsPerItem() {
-    return similarItemsPerItem;
-  }
-
-  public void setSimilarItemsPerItem(int similarItemsPerItem) {
-    this.similarItemsPerItem = similarItemsPerItem;
+  public void setName(String name) {
+    this.name = name;
   }
 }

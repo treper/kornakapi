@@ -29,7 +29,7 @@ import java.io.File;
 public abstract class BaseServlet extends HttpServlet {
 
   private Components getComponents() {
-    return (Components) getServletContext().getAttribute("components");
+    return Components.instance();
   }
 
   protected File getModelDirectory() {

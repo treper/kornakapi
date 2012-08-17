@@ -15,22 +15,13 @@
 
 package org.plista.kornakapi.core.config;
 
-public class FactorizationbasedRecommenderConfig {
+public class FactorizationbasedRecommenderConfig extends RecommenderConfig {
 
-  private String name;
   private boolean usesImplicitFeedback;
   private int numberOfFeatures;
   private int numberOfIterations;
   private double lambda;
   private double alpha;
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
 
   public boolean isUsesImplicitFeedback() {
     return usesImplicitFeedback;

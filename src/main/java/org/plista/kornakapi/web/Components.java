@@ -15,30 +15,54 @@
 
 package org.plista.kornakapi.web;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.Trainer;
+import org.quartz.Scheduler;
 
 import java.util.Map;
 
 public class Components {
 
-  private final Configuration conf;
-  private final Storage storage;
-  private final Map<String, Recommender> recommenders;
-  private final Map<String, Trainer> trainers;
+  private Configuration conf;
+  private Storage storage;
+  private Iterable<String> names;
+  private Map<String, Recommender> recommenders;
+  private Map<String, Trainer> trainers;
+  private Scheduler scheduler;
 
-  public Components(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
-      Map<String, Trainer> trainers) {
+  private static Components INSTANCE;
+
+  private Components(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
+        Map<String, Trainer> trainers, Scheduler scheduler) {
     this.conf = conf;
     this.storage = storage;
+    names = Sets.newHashSet(recommenders.keySet());
     this.recommenders = recommenders;
     this.trainers = trainers;
+    this.scheduler = scheduler;
   }
+
+  public static synchronized void init(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
+      Map<String, Trainer> trainers, Scheduler scheduler) {
+    Preconditions.checkState(INSTANCE == null);
+    INSTANCE = new Components(conf, storage, recommenders, trainers, scheduler);
+  }
+
+  public static Components instance() {
+    return Preconditions.checkNotNull(INSTANCE);
+  }
+
 
   public Configuration getConfiguration() {
     return conf;
+  }
+
+  public Iterable<String> configuredRecommenderNames() {
+    return names;
   }
 
   public Recommender recommender(String name) {
@@ -51,5 +75,9 @@ public class Components {
 
   public Storage storage() {
     return storage;
+  }
+
+  public Scheduler scheduler() {
+    return scheduler;
   }
 }

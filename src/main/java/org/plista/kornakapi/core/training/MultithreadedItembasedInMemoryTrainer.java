@@ -22,10 +22,8 @@ import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
-import org.plista.kornakapi.core.storage.Storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,32 +39,31 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MultithreadedItembasedInMemoryTrainer implements Trainer {
+public class MultithreadedItembasedInMemoryTrainer extends AbstractTrainer {
 
   private final ItembasedRecommenderConfig conf;
 
   private static final Logger log = LoggerFactory.getLogger(MultithreadedItembasedInMemoryTrainer.class);
 
   public MultithreadedItembasedInMemoryTrainer(ItembasedRecommenderConfig conf) {
+    super(conf);
     this.conf = conf;
   }
 
   @Override
-  public void train(File modelDirectory, Storage storage, Recommender recommender) throws IOException {
-
+  protected void doTrain(File targetFile, DataModel inmemoryData) throws IOException {
     BufferedWriter writer = null;
     int numProcessors = Runtime.getRuntime().availableProcessors();
     ExecutorService executorService = Executors.newFixedThreadPool(numProcessors);
 
     try {
-      DataModel inmemoryData = storage.trainingData();
 
       ItemSimilarity similarity = (ItemSimilarity) Class.forName(conf.getSimilarityClass())
           .getConstructor(DataModel.class).newInstance(inmemoryData);
 
       ItemBasedRecommender trainer = new GenericItemBasedRecommender(inmemoryData, similarity);
 
-      writer = new BufferedWriter(new FileWriter(new File(modelDirectory, conf.getName() + ".model")));
+      writer = new BufferedWriter(new FileWriter(targetFile));
 
       int batchSize = 100;
       int numItems = inmemoryData.getNumItems();
@@ -96,8 +93,6 @@ public class MultithreadedItembasedInMemoryTrainer implements Trainer {
       }
       Closeables.closeQuietly(writer);
     }
-
-    recommender.refresh(null);
   }
 
   private List<long[]> queueItemIDsInBatches(LongPrimitiveIterator itemIDs, int numItems, int batchSize) {

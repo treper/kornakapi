@@ -87,27 +87,13 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
     log.debug("Recommending items for user ID '{}'", userID);
 
     PreferenceArray preferencesFromUser = getDataModel().getPreferencesFromUser(userID);
-    FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser, rescorer);
+    FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser);
 
     List<RecommendedItem> topItems = TopItems.getTopItems(howMany, possibleItemIDs.iterator(), rescorer,
-        new Estimator(userID), false);
+        new Estimator(userID));
     log.debug("Recommendations are: {}", topItems);
 
     return topItems;
-  }
-
-  @Override
-  protected FastIDSet getAllOtherItems(long userID, PreferenceArray preferencesFromUser, IDRescorer rescorer)
-  throws TasteException {
-    FastIDSet candidates = candidateItemsStrategy.getCandidateItems(userID, preferencesFromUser, getDataModel());
-
-    System.out.println(candidates.size() + " candidate items before filtering");
-
-    maybeFilterCandidateItems(rescorer, candidates);
-
-    System.out.println(candidates.size() + " candidate items after filtering");
-
-    return candidates;
   }
 
   @Override
