@@ -25,25 +25,28 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
-public class TrainAllRecommendersJob implements Job {
+public class TrainRecommenderJob implements Job {
 
-  private static final Logger log = LoggerFactory.getLogger(TrainAllRecommendersJob.class);
+  public static final String RECOMMENDER_NAME_PARAM = TrainRecommenderJob.class.getName() + ".recommenderName";
+
+  private static final Logger log = LoggerFactory.getLogger(TrainRecommenderJob.class);
 
   @Override
   public void execute(JobExecutionContext context) throws JobExecutionException {
 
     Components components = Components.instance();
 
-    for (String recommenderName : components.configuredRecommenderNames()) {
-      Trainer trainer = components.trainer(recommenderName);
+    String recommenderName = context.getJobDetail().getJobDataMap().getString(RECOMMENDER_NAME_PARAM);
 
-      log.info("Training for recommender [{}] started by trigger.", recommenderName);
-      try {
-        trainer.train(new File(components.getConfiguration().getModelDirectory()), components.storage(),
-            components.recommender(recommenderName));
-      } catch (IOException e) {
-        log.warn("Training of recommender [" + recommenderName + "] failed!", e);
-      }
+    Trainer trainer = components.trainer(recommenderName);
+
+    log.info("Training for recommender [{}] started.", recommenderName);
+    try {
+      trainer.train(new File(components.getConfiguration().getModelDirectory()), components.storage(),
+          components.recommender(recommenderName));
+    } catch (IOException e) {
+      log.warn("Training of recommender [" + recommenderName + "] failed!", e);
     }
+    log.info("Training for recommender [{}] done.", recommenderName);
   }
 }

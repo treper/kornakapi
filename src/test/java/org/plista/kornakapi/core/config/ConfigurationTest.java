@@ -1,3 +1,18 @@
+/**
+ * Copyright 2012 plista GmbH  (http://www.plista.com/)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and limitations under the License.
+ */
+
 package org.plista.kornakapi.core.config;
 
 import com.thoughtworks.xstream.XStream;
@@ -6,9 +21,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 
 public class ConfigurationTest {
 
@@ -17,20 +31,25 @@ public class ConfigurationTest {
 
     String xml =
         "<configuration>\n" +
+
         "  <modelDirectory>/tmp/models</modelDirectory>\n" +
+
         "  <storageConfiguration>\n" +
         "    <jdbcDriverClass>com.mysql.jdbc.Driver</jdbcDriverClass>\n" +
         "    <jdbcUrl>jdbc:mysql://localhost/plista</jdbcUrl>\n" +
         "    <username>root</username>\n" +
         "    <password>secret</password>\n" +
         "  </storageConfiguration>\n" +
+
         "  <itembasedRecommenders>\n" +
         "    <itembasedRecommender>\n" +
         "      <name>itembased</name>\n" +
         "      <similarityClass>org.apache.mahout.cf.taste.impl.similarity.LogLikelihoodSimilarity</similarityClass>\n" +
         "      <similarItemsPerItem>25</similarItemsPerItem>\n" +
+        "      <retrainCronExpression>0 0 1 * * ?</retrainCronExpression>\n" +
         "    </itembasedRecommender>\n" +
         "  </itembasedRecommenders>\n" +
+
         "  <factorizationbasedRecommenders>\n" +
         "    <factorizationbasedRecommender>\n" +
         "      <name>weighted-mf</name>\n" +
@@ -41,6 +60,7 @@ public class ConfigurationTest {
         "      <alpha>40.0</alpha>\n" +
         "    </factorizationbasedRecommender>\n" +
         "  </factorizationbasedRecommenders>\n" +
+
         "</configuration>";
 
     Configuration conf = Configuration.fromXML(xml);
@@ -62,6 +82,7 @@ public class ConfigurationTest {
     assertEquals("itembased", itembasedRecommenderConf.getName());
     assertEquals(LogLikelihoodSimilarity.class.getName(), itembasedRecommenderConf.getSimilarityClass());
     assertEquals(25, itembasedRecommenderConf.getSimilarItemsPerItem());
+    assertEquals("0 0 1 * * ?", itembasedRecommenderConf.getRetrainCronExpression());
 
     List<FactorizationbasedRecommenderConfig> factorizationbasedRecommenders = conf.getFactorizationbasedRecommenders();
     assertNotNull(factorizationbasedRecommenders);
@@ -74,6 +95,7 @@ public class ConfigurationTest {
     assertEquals(10, factorizationbasedRecommenderConf.getNumberOfIterations());
     assertEquals(0.01, factorizationbasedRecommenderConf.getLambda(), 0);
     assertEquals(40, factorizationbasedRecommenderConf.getAlpha(), 0);
+    assertNull(factorizationbasedRecommenderConf.getRetrainCronExpression());
   }
 
   @Test
@@ -92,6 +114,7 @@ public class ConfigurationTest {
 
     ItembasedRecommenderConfig itembasedRecommenderConf = new ItembasedRecommenderConfig();
     itembasedRecommenderConf.setName("itembased");
+    itembasedRecommenderConf.setRetrainCronExpression("0 0 1 * * ?");
     itembasedRecommenderConf.setSimilarityClass(LogLikelihoodSimilarity.class.getName());
     itembasedRecommenderConf.setSimilarItemsPerItem(25);
 

@@ -37,20 +37,9 @@ import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
 import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
-import org.plista.kornakapi.core.training.TrainAllRecommendersJob;
 import org.plista.kornakapi.core.training.Trainer;
+import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.plista.kornakapi.web.Components;
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.quartz.impl.DirectSchedulerFactory;
-import org.quartz.simpl.RAMJobStore;
-import org.quartz.simpl.SimpleThreadPool;
-import org.quartz.spi.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +66,8 @@ public class BigBangServletContextListener implements ServletContextListener {
       Map<String, Recommender> recommenders = Maps.newHashMap();
       Map<String, Trainer> trainers = Maps.newHashMap();
 
+      TrainingScheduler scheduler = new TrainingScheduler();
+
       for (ItembasedRecommenderConfig itembasedConf : conf.getItembasedRecommenders()) {
 
         String name = itembasedConf.getName();
@@ -88,6 +79,13 @@ public class BigBangServletContextListener implements ServletContextListener {
 
         recommenders.put(name, recommender);
         trainers.put(name, new MultithreadedItembasedInMemoryTrainer(itembasedConf));
+
+        scheduler.addRecommenderTrainingJob(name);
+
+        String cronExpression = itembasedConf.getRetrainCronExpression();
+        if (cronExpression != null) {
+          scheduler.cronScheduleRecommenderTraining(name, cronExpression);
+        }
 
         log.info("Created ItemBasedRecommender [{}] using similarity [{}] and [{}] similar items per item",
             new Object[] { name, itembasedConf.getSimilarityClass(), itembasedConf.getSimilarItemsPerItem() });
@@ -109,25 +107,17 @@ public class BigBangServletContextListener implements ServletContextListener {
         recommenders.put(name, svdRecommender);
         trainers.put(name, new FactorizationbasedInMemoryTrainer(factorizationbasedConf));
 
+        scheduler.addRecommenderTrainingJob(name);
+
+        String cronExpression = factorizationbasedConf.getRetrainCronExpression();
+        if (cronExpression != null) {
+          scheduler.cronScheduleRecommenderTraining(name, cronExpression);
+        }
+
         log.info("Created FactorizationBasedRecommender [{}] using [{}] features and [{}] iterations",
             new Object[] { name, factorizationbasedConf.getNumberOfFeatures(),
                 factorizationbasedConf.getNumberOfIterations() });
       }
-
-      ThreadPool threadPool = new SimpleThreadPool(1, Thread.NORM_PRIORITY); threadPool.initialize();
-
-      DirectSchedulerFactory schedulerFactory = DirectSchedulerFactory.getInstance();
-      schedulerFactory.createScheduler(threadPool, new RAMJobStore());
-      Scheduler scheduler = schedulerFactory.getScheduler();
-
-      JobDetail job = JobBuilder.newJob(TrainAllRecommendersJob.class).build();
-
-      // http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger
-      CronTrigger trigger = TriggerBuilder.newTrigger()
-          .withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 * * ?"))
-          .build();
-
-      scheduler.scheduleJob(job, trigger);
 
       Components.init(conf, storage, recommenders, trainers, scheduler);
 
@@ -143,10 +133,6 @@ public class BigBangServletContextListener implements ServletContextListener {
     Components components = Components.instance();
 
     Closeables.closeQuietly(components.storage());
-    try {
-      components.scheduler().shutdown();
-    } catch (SchedulerException e) {
-      throw new IllegalStateException(e);
-    }
+    Closeables.closeQuietly(components.scheduler());
   }
 }

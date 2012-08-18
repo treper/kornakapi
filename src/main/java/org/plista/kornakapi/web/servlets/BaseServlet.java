@@ -17,14 +17,13 @@ package org.plista.kornakapi.web.servlets;
 
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.plista.kornakapi.core.storage.Storage;
-import org.plista.kornakapi.core.training.Trainer;
+import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.plista.kornakapi.web.Components;
 import org.plista.kornakapi.web.InvalidParameterException;
 import org.plista.kornakapi.web.MissingParameterException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 
 public abstract class BaseServlet extends HttpServlet {
 
@@ -32,16 +31,12 @@ public abstract class BaseServlet extends HttpServlet {
     return Components.instance();
   }
 
-  protected File getModelDirectory() {
-    return new File(getComponents().getConfiguration().getModelDirectory());
-  }
-
   protected Recommender getRecommender(String name) {
     return getComponents().recommender(name);
   }
 
-  protected Trainer getTrainer(String name) {
-    return getComponents().trainer(name);
+  protected TrainingScheduler getScheduler() {
+    return getComponents().scheduler();
   }
 
   protected Storage getStorage() {

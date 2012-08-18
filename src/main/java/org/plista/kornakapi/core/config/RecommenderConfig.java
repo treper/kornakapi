@@ -19,11 +19,21 @@ public abstract class RecommenderConfig {
 
   private String name;
 
+  private String retrainCronExpression;
+
   public String getName() {
     return name;
   }
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public String getRetrainCronExpression() {
+    return retrainCronExpression;
+  }
+
+  public void setRetrainCronExpression(String retrainCronExpression) {
+    this.retrainCronExpression = retrainCronExpression;
   }
 }

@@ -21,6 +21,7 @@ import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.Trainer;
+import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.quartz.Scheduler;
 
 import java.util.Map;
@@ -32,12 +33,12 @@ public class Components {
   private Iterable<String> names;
   private Map<String, Recommender> recommenders;
   private Map<String, Trainer> trainers;
-  private Scheduler scheduler;
+  private TrainingScheduler scheduler;
 
   private static Components INSTANCE;
 
   private Components(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
-        Map<String, Trainer> trainers, Scheduler scheduler) {
+        Map<String, Trainer> trainers, TrainingScheduler scheduler) {
     this.conf = conf;
     this.storage = storage;
     names = Sets.newHashSet(recommenders.keySet());
@@ -47,7 +48,7 @@ public class Components {
   }
 
   public static synchronized void init(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
-      Map<String, Trainer> trainers, Scheduler scheduler) {
+      Map<String, Trainer> trainers, TrainingScheduler scheduler) {
     Preconditions.checkState(INSTANCE == null);
     INSTANCE = new Components(conf, storage, recommenders, trainers, scheduler);
   }
@@ -77,7 +78,7 @@ public class Components {
     return storage;
   }
 
-  public Scheduler scheduler() {
+  public TrainingScheduler scheduler() {
     return scheduler;
   }
 }
