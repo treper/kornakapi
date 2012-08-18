@@ -19,6 +19,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.UnmodifiableIterator;
 import org.apache.mahout.common.iterator.FileLineIterator;
 import org.plista.kornakapi.core.Candidate;
+import org.plista.kornakapi.core.MutableCandidate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,13 +28,13 @@ import java.util.regex.Pattern;
 public class CSVCandidateFileIterator extends UnmodifiableIterator<Candidate> {
 
   private final FileLineIterator lineIterator;
-  private final Candidate mutableCandidate;
+  private final MutableCandidate mutableCandidate;
 
   private static final Pattern SEPARATOR = Pattern.compile("[\t,]");
 
   public CSVCandidateFileIterator(InputStream in) throws IOException {
     lineIterator = new FileLineIterator(in, Charsets.UTF_8, false);
-    mutableCandidate = new Candidate();
+    mutableCandidate = new MutableCandidate();
   }
 
   @Override

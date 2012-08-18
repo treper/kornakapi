@@ -36,11 +36,11 @@ public interface Storage extends Closeable {
 
   void addCandidate(String label, long itemID) throws IOException;
 
-  void batchAddCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException;
+  Iterable<String> batchAddCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException;
 
   void deleteCandidate(String label, long itemID) throws IOException;
 
-  void batchDeleteCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException;
+  Iterable<String> batchDeleteCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException;
 
   FastIDSet getCandidates(String label) throws IOException;
 }

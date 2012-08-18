@@ -15,9 +15,24 @@
 
 package org.plista.kornakapi.core;
 
-public interface Candidate {
+public class MutableCandidate implements Candidate {
 
-  String getLabel();
+  private String label;
+  private long itemID;
 
-  long getItemID();
+  public void set(String label, long itemID) {
+    this.label = label;
+    this.itemID = itemID;
+  }
+
+  @Override
+  public String getLabel() {
+    return label;
+  }
+
+  @Override
+  public long getItemID() {
+    return itemID;
+  }
+
 }

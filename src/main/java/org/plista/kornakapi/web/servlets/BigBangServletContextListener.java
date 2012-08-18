@@ -34,7 +34,9 @@ import org.plista.kornakapi.core.FactorizationbasedRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
+import org.plista.kornakapi.core.storage.CandidateCacheStorageDecorator;
 import org.plista.kornakapi.core.storage.MySqlStorage;
+import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.Trainer;
@@ -59,7 +61,7 @@ public class BigBangServletContextListener implements ServletContextListener {
       String xml = Files.toString(new File("/home/ssc/Desktop/plista/test.conf"), Charsets.UTF_8);
       Configuration conf = Configuration.fromXML(xml);
 
-      MySqlStorage storage = new MySqlStorage(conf.getStorageConfiguration());
+      Storage storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
 
       DataModel persistentData = storage.recommenderData();
 
@@ -80,11 +82,11 @@ public class BigBangServletContextListener implements ServletContextListener {
         recommenders.put(name, recommender);
         trainers.put(name, new MultithreadedItembasedInMemoryTrainer(itembasedConf));
 
-        scheduler.addRecommenderTrainingJob(name);
-
         String cronExpression = itembasedConf.getRetrainCronExpression();
-        if (cronExpression != null) {
-          scheduler.cronScheduleRecommenderTraining(name, cronExpression);
+        if (cronExpression == null) {
+          scheduler.addRecommenderTrainingJob(name);
+        } else {
+          scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
         }
 
         log.info("Created ItemBasedRecommender [{}] using similarity [{}] and [{}] similar items per item",
@@ -107,11 +109,11 @@ public class BigBangServletContextListener implements ServletContextListener {
         recommenders.put(name, svdRecommender);
         trainers.put(name, new FactorizationbasedInMemoryTrainer(factorizationbasedConf));
 
-        scheduler.addRecommenderTrainingJob(name);
-
         String cronExpression = factorizationbasedConf.getRetrainCronExpression();
-        if (cronExpression != null) {
-          scheduler.cronScheduleRecommenderTraining(name, cronExpression);
+        if (cronExpression == null) {
+          scheduler.addRecommenderTrainingJob(name);
+        } else {
+          scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
         }
 
         log.info("Created FactorizationBasedRecommender [{}] using [{}] features and [{}] iterations",

@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core.storage;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
@@ -35,6 +36,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Set;
 
 public class MySqlStorage implements Storage {
 
@@ -160,7 +162,10 @@ public class MySqlStorage implements Storage {
   }
 
   @Override
-  public void batchAddCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException {
+  public Iterable<String> batchAddCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException {
+
+    Set<String> modifiedLabels = Sets.newHashSet();
+
     Connection conn = null;
     PreparedStatement stmt = null;
 
@@ -171,7 +176,11 @@ public class MySqlStorage implements Storage {
       int recordsQueued = 0;
 
       while (candidates.hasNext()) {
+
         Candidate candidate = candidates.next();
+
+        modifiedLabels.add(candidate.getLabel());
+
         stmt.setString(1, candidate.getLabel());
         stmt.setLong(2, candidate.getItemID());
         stmt.addBatch();
@@ -193,6 +202,8 @@ public class MySqlStorage implements Storage {
       IOUtils.quietClose(stmt);
       IOUtils.quietClose(conn);
     }
+
+    return modifiedLabels;
   }
 
   @Override
@@ -218,7 +229,10 @@ public class MySqlStorage implements Storage {
   }
 
   @Override
-  public void batchDeleteCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException {
+  public Iterable<String> batchDeleteCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException {
+
+    Set<String> modifiedLabels = Sets.newHashSet();
+
     Connection conn = null;
     PreparedStatement stmt = null;
 
@@ -229,7 +243,11 @@ public class MySqlStorage implements Storage {
       int recordsQueued = 0;
 
       while (candidates.hasNext()) {
+
         Candidate candidate = candidates.next();
+
+        modifiedLabels.add(candidate.getLabel());
+
         stmt.setString(1, candidate.getLabel());
         stmt.setLong(2, candidate.getItemID());
         stmt.addBatch();
@@ -251,6 +269,8 @@ public class MySqlStorage implements Storage {
       IOUtils.quietClose(stmt);
       IOUtils.quietClose(conn);
     }
+
+    return modifiedLabels;
   }
 
   @Override

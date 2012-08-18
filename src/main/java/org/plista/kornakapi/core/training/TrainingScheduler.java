@@ -70,9 +70,12 @@ public class TrainingScheduler implements Closeable {
     }
   }
 
-  public void cronScheduleRecommenderTraining(String recommenderName, String cronExpression) {
+  public void addRecommenderTrainingJobWithCronSchedule(String recommenderName, String cronExpression) {
     try {
-      JobDetail job = scheduler.getJobDetail(key(recommenderName));
+      JobDetail job = JobBuilder.newJob(TrainRecommenderJob.class)
+          .withIdentity(key(recommenderName))
+          .build();
+      job.getJobDataMap().put(TrainRecommenderJob.RECOMMENDER_NAME_PARAM, recommenderName);
 
       // http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger
       CronTrigger trigger = TriggerBuilder.newTrigger()

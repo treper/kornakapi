@@ -39,7 +39,7 @@ public class RecommendServlet extends BaseServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    String method = getParameter(request, Parameters.RECOMMENDER, true);
+    String recommenderName = getParameter(request, Parameters.RECOMMENDER, true);
     long userID = getParameterAsLong(request, Parameters.USER_ID, false);
     int howMany = getParameterAsInt(request, Parameters.HOW_MANY, Parameters.DEFAULT_HOW_MANY);
 
@@ -49,14 +49,12 @@ public class RecommendServlet extends BaseServlet {
       String label = getParameter(request, Parameters.LABEL, false);
       FastIDSet candidates = getStorage().getCandidates(label);
 
-      System.out.println("Found " + candidates.size() + " for label " + label);
-
       if (!candidates.isEmpty()) {
         rescorer = new FixedCandidatesIDRescorer(candidates);
       }
     }
 
-    Recommender recommender = getRecommender(method);
+    Recommender recommender = getRecommender(recommenderName);
 
     try {
       List<RecommendedItem> recommendedItems = recommender.recommend(userID, howMany, rescorer);
@@ -79,7 +77,8 @@ public class RecommendServlet extends BaseServlet {
       writer.write("]");
 
       if (log.isDebugEnabled()) {
-        log.debug(recommendedItems.size() + " recommendations for user " + userID + " using method " + method);
+        log.debug("{} recommendations for user {} using recommender {}",
+            new Object[] { recommendedItems.size(), userID, recommenderName });
       }
 
     } catch (TasteException e) {
