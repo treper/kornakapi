@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  */
 
-package org.plista.kornakapi.core;
+package org.plista.kornakapi.core.recommender;
 
 import com.google.common.base.Preconditions;
 import org.apache.mahout.cf.taste.common.Refreshable;
@@ -58,7 +58,7 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
       throw new TasteException("Error loading factorization", e);
     }
 
-    Preconditions.checkArgument(factorization != null, "PersistenceStrategy must provide an initial factorization");
+    Preconditions.checkNotNull(factorization, "PersistenceStrategy must provide an initial factorization");
 
     refreshHelper = new RefreshHelper(new Callable<Object>() {
       @Override

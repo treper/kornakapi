@@ -20,7 +20,7 @@ import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.plista.kornakapi.core.FixedCandidatesIDRescorer;
+import org.plista.kornakapi.core.recommender.FixedCandidatesIDRescorer;
 import org.plista.kornakapi.web.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

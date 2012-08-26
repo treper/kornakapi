@@ -22,7 +22,6 @@ import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.core.training.TrainingScheduler;
-import org.quartz.Scheduler;
 
 import java.util.Map;
 

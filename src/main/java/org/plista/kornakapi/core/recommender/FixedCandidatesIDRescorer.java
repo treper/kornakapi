@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  */
 
-package org.plista.kornakapi.core;
+package org.plista.kornakapi.core.recommender;
 
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;

@@ -19,8 +19,10 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.recommender.AllSimilarItemsCandidateItemsStrategy;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
+import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
 import org.apache.mahout.cf.taste.impl.recommender.svd.FilePersistenceStrategy;
 import org.apache.mahout.cf.taste.impl.recommender.svd.PersistenceStrategy;
 import org.apache.mahout.cf.taste.impl.similarity.file.FileItemSimilarity;
@@ -29,8 +31,8 @@ import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
 import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
-import org.plista.kornakapi.core.CachingAllUnknownItemsCandidateItemsStrategy;
-import org.plista.kornakapi.core.FactorizationbasedRecommender;
+import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
+import org.plista.kornakapi.core.recommender.FactorizationbasedRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
@@ -48,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public class BigBangServletContextListener implements ServletContextListener {
@@ -73,7 +76,17 @@ public class BigBangServletContextListener implements ServletContextListener {
       for (ItembasedRecommenderConfig itembasedConf : conf.getItembasedRecommenders()) {
 
         String name = itembasedConf.getName();
-        ItemSimilarity itemSimilarity = new FileItemSimilarity(new File(conf.getModelDirectory(), name + ".model"));
+
+        File modelFile = modelFile(conf, name);
+
+        if (!modelFile.exists()) {
+          boolean created = modelFile.createNewFile();
+          if (!created) {
+            throw new IllegalStateException("Cannot create file in model directory" + conf.getModelDirectory());
+          }
+        }
+
+        ItemSimilarity itemSimilarity = new FileItemSimilarity(modelFile);
         AllSimilarItemsCandidateItemsStrategy allSimilarItemsStrategy =
             new AllSimilarItemsCandidateItemsStrategy(itemSimilarity);
         ItemBasedRecommender recommender = new GenericItemBasedRecommender(persistentData, itemSimilarity,
@@ -97,8 +110,13 @@ public class BigBangServletContextListener implements ServletContextListener {
 
         String name = factorizationbasedConf.getName();
 
-        PersistenceStrategy persistence = new FilePersistenceStrategy(new File(conf.getModelDirectory(),
-            name + ".model"));
+        File modelFile = new File(conf.getModelDirectory(), name + ".model");
+
+        PersistenceStrategy persistence = new FilePersistenceStrategy(modelFile);
+
+        if (!modelFile.exists()) {
+          createEmptyFactorization(persistence);
+        }
 
         CandidateItemsStrategy allUnknownItemsStrategy =
             new CachingAllUnknownItemsCandidateItemsStrategy(persistentData);
@@ -128,6 +146,15 @@ public class BigBangServletContextListener implements ServletContextListener {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private void createEmptyFactorization(PersistenceStrategy strategy) throws IOException {
+    strategy.maybePersist(new Factorization(new FastByIDMap<Integer>(0), new FastByIDMap<Integer>(0),
+        new double[0][0], new double[0][0]));
+  }
+
+  private File modelFile(Configuration conf, String recommenderName) {
+    return new File(conf.getModelDirectory(), recommenderName + ".model");
   }
 
   @Override
