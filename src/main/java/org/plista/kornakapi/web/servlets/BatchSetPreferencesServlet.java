@@ -22,7 +22,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.mahout.cf.taste.model.Preference;
 import org.plista.kornakapi.core.io.CSVPreferenceFileIterator;
-import org.plista.kornakapi.core.io.CSVPreferenceFileIterator;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.web.Parameters;
 
@@ -47,7 +46,7 @@ public class BatchSetPreferencesServlet extends BaseServlet {
 
     boolean fileProcessed = false;
 
-    Storage storage = getStorage();
+    Storage storage = storage();
 
     try {
       fileItems = upload.getItemIterator(request);

@@ -21,6 +21,10 @@ public abstract class RecommenderConfig {
 
   private String retrainCronExpression;
 
+  private int retrainAfterPreferenceChanges = DONT_RETRAIN_ON_PREFERENCE_CHANGES;
+
+  public static final int DONT_RETRAIN_ON_PREFERENCE_CHANGES = 0;
+
   public String getName() {
     return name;
   }
@@ -35,5 +39,13 @@ public abstract class RecommenderConfig {
 
   public void setRetrainCronExpression(String retrainCronExpression) {
     this.retrainCronExpression = retrainCronExpression;
+  }
+
+  public int getRetrainAfterPreferenceChanges() {
+    return retrainAfterPreferenceChanges;
+  }
+
+  public void setRetrainAfterPreferenceChanges(int retrainAfterPreferenceChanges) {
+    this.retrainAfterPreferenceChanges = retrainAfterPreferenceChanges;
   }
 }

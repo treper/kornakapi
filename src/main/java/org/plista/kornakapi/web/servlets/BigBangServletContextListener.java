@@ -31,6 +31,7 @@ import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
 import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
+import org.plista.kornakapi.core.config.RecommenderConfig;
 import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
 import org.plista.kornakapi.core.recommender.FactorizationbasedRecommender;
 import org.plista.kornakapi.core.config.Configuration;
@@ -43,6 +44,8 @@ import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.core.training.TrainingScheduler;
+import org.plista.kornakapi.core.training.preferencechanges.DelegatingPreferenceChangeListener;
+import org.plista.kornakapi.core.training.preferencechanges.InMemoryPreferenceChangeListener;
 import org.plista.kornakapi.web.Components;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +75,7 @@ public class BigBangServletContextListener implements ServletContextListener {
       Map<String, Trainer> trainers = Maps.newHashMap();
 
       TrainingScheduler scheduler = new TrainingScheduler();
+      DelegatingPreferenceChangeListener preferenceChangeListener = new DelegatingPreferenceChangeListener();
 
       for (ItembasedRecommenderConfig itembasedConf : conf.getItembasedRecommenders()) {
 
@@ -100,6 +104,12 @@ public class BigBangServletContextListener implements ServletContextListener {
           scheduler.addRecommenderTrainingJob(name);
         } else {
           scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
+        }
+
+        if (itembasedConf.getRetrainAfterPreferenceChanges() !=
+            RecommenderConfig.DONT_RETRAIN_ON_PREFERENCE_CHANGES) {
+          preferenceChangeListener.addDelegate(new InMemoryPreferenceChangeListener(scheduler, name,
+              itembasedConf.getRetrainAfterPreferenceChanges()));
         }
 
         log.info("Created ItemBasedRecommender [{}] using similarity [{}] and [{}] similar items per item",
@@ -134,12 +144,18 @@ public class BigBangServletContextListener implements ServletContextListener {
           scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
         }
 
+        if (factorizationbasedConf.getRetrainAfterPreferenceChanges() !=
+            RecommenderConfig.DONT_RETRAIN_ON_PREFERENCE_CHANGES) {
+          preferenceChangeListener.addDelegate(new InMemoryPreferenceChangeListener(scheduler, name,
+              factorizationbasedConf.getRetrainAfterPreferenceChanges()));
+        }
+
         log.info("Created FactorizationBasedRecommender [{}] using [{}] features and [{}] iterations",
             new Object[] { name, factorizationbasedConf.getNumberOfFeatures(),
                 factorizationbasedConf.getNumberOfIterations() });
       }
 
-      Components.init(conf, storage, recommenders, trainers, scheduler);
+      Components.init(conf, storage, recommenders, trainers, scheduler, preferenceChangeListener);
 
       scheduler.start();
 

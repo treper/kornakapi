@@ -30,6 +30,6 @@ public class DeleteCandidateServlet extends BaseServlet {
     String label = getParameter(request, Parameters.LABEL, true);
     long itemID = getParameterAsLong(request, Parameters.ITEM_ID, true);
 
-    getStorage().deleteCandidate(label, itemID);
+    storage().deleteCandidate(label, itemID);
   }
 }

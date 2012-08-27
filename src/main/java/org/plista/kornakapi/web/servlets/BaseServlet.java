@@ -18,6 +18,7 @@ package org.plista.kornakapi.web.servlets;
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.TrainingScheduler;
+import org.plista.kornakapi.core.training.preferencechanges.PreferenceChangeListener;
 import org.plista.kornakapi.web.Components;
 import org.plista.kornakapi.web.InvalidParameterException;
 import org.plista.kornakapi.web.MissingParameterException;
@@ -31,16 +32,20 @@ public abstract class BaseServlet extends HttpServlet {
     return Components.instance();
   }
 
-  protected Recommender getRecommender(String name) {
+  protected Recommender recommender(String name) {
     return getComponents().recommender(name);
   }
 
-  protected TrainingScheduler getScheduler() {
+  protected TrainingScheduler scheduler() {
     return getComponents().scheduler();
   }
 
-  protected Storage getStorage() {
+  protected Storage storage() {
     return getComponents().storage();
+  }
+
+  protected PreferenceChangeListener preferenceChangeListener() {
+    return getComponents().preferenceChangeListener();
   }
 
   protected boolean hasParameter(HttpServletRequest request, String name) {

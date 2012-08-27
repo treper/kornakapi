@@ -47,14 +47,14 @@ public class RecommendServlet extends BaseServlet {
 
     if (hasParameter(request, Parameters.LABEL)) {
       String label = getParameter(request, Parameters.LABEL, false);
-      FastIDSet candidates = getStorage().getCandidates(label);
+      FastIDSet candidates = storage().getCandidates(label);
 
       if (!candidates.isEmpty()) {
         rescorer = new FixedCandidatesIDRescorer(candidates);
       }
     }
 
-    Recommender recommender = getRecommender(recommenderName);
+    Recommender recommender = recommender(recommenderName);
 
     try {
       List<RecommendedItem> recommendedItems = recommender.recommend(userID, howMany, rescorer);

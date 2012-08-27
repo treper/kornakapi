@@ -66,17 +66,18 @@ public class MySqlStorage implements Storage {
     dataSource.setUsername(storageConf.getUsername());
     dataSource.setPassword(storageConf.getPassword());
 
-    this.dataSource = dataSource;
-    /*dataSource.setMaxActive(cfg.asInt("datasourceMaxActive"));
-    dataSource.setMinIdle(config().asInt("datasourceMinIdle"));
-    dataSource.setInitialSize(config().asInt("datasourceInitialSize"));
-    dataSource.setValidationQuery(config().asString("datasourceValidationQuery"));
-    dataSource.setTestOnBorrow(config().asBoolean("datasourceTestOnBorrow"));
-    dataSource.setTestOnReturn(config().asBoolean("datasourceTestOnReturn"));
-    dataSource.setTestWhileIdle(config().asBoolean("datasourceTestWhileIdle"));
-    dataSource.setTimeBetweenEvictionRunsMillis(config().asLong("datasourceTimeBetweenEvictionRunsMillis"));    */
+    //TODO should be made configurable
+    dataSource.setMaxActive(10);
+    dataSource.setMinIdle(5);
+    dataSource.setInitialSize(5);
+    dataSource.setValidationQuery("SELECT 1;");
+    dataSource.setTestOnBorrow(false);
+    dataSource.setTestOnReturn(false);
+    dataSource.setTestWhileIdle(true);
+    dataSource.setTimeBetweenEvictionRunsMillis(5000);
 
     dataModel = new MySQLJDBCDataModel(dataSource);
+    this.dataSource = dataSource;
   }
 
   @Override

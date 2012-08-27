@@ -13,22 +13,24 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  */
 
-package org.plista.kornakapi.web.servlets;
+package org.plista.kornakapi.core.training.preferencechanges;
 
-import org.plista.kornakapi.web.Parameters;
+import com.google.common.collect.Lists;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.List;
 
-public class TrainServlet extends BaseServlet {
+public class DelegatingPreferenceChangeListener implements PreferenceChangeListener {
+
+  private final List<PreferenceChangeListener> delegates = Lists.newArrayList();
+
+  public void addDelegate(PreferenceChangeListener listener) {
+    delegates.add(listener);
+  }
 
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    String recommender = getParameter(request, Parameters.RECOMMENDER, true);
-
-    scheduler().immediatelyTrainRecommender(recommender);
+  public void notifyOfPreferenceChange() {
+    for (PreferenceChangeListener listener : delegates) {
+      listener.notifyOfPreferenceChange();
+    }
   }
 }

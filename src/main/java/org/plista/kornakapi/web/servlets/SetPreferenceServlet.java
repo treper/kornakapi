@@ -31,6 +31,7 @@ public class SetPreferenceServlet extends BaseServlet {
     long itemID = getParameterAsLong(request, Parameters.ITEM_ID, true);
     float value = getParameterAsFloat(request, Parameters.VALUE, true);
 
-    getStorage().setPreference(userID, itemID, value);
+    storage().setPreference(userID, itemID, value);
+    preferenceChangeListener().notifyOfPreferenceChange();
   }
 }

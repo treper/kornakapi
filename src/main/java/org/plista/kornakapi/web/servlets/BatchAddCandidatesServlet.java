@@ -45,7 +45,7 @@ public class BatchAddCandidatesServlet extends BaseServlet {
 
     boolean fileProcessed = false;
 
-    Storage storage = getStorage();
+    Storage storage = storage();
 
     try {
       fileItems = upload.getItemIterator(request);

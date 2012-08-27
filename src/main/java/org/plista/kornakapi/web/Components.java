@@ -22,34 +22,37 @@ import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.core.training.TrainingScheduler;
+import org.plista.kornakapi.core.training.preferencechanges.PreferenceChangeListener;
 
 import java.util.Map;
 
 public class Components {
 
-  private Configuration conf;
-  private Storage storage;
-  private Iterable<String> names;
-  private Map<String, Recommender> recommenders;
-  private Map<String, Trainer> trainers;
-  private TrainingScheduler scheduler;
+  private final Configuration conf;
+  private final Storage storage;
+  private final Iterable<String> names;
+  private final Map<String, Recommender> recommenders;
+  private final Map<String, Trainer> trainers;
+  private final TrainingScheduler scheduler;
+  private final PreferenceChangeListener preferenceChangeListener;
 
   private static Components INSTANCE;
 
   private Components(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
-        Map<String, Trainer> trainers, TrainingScheduler scheduler) {
+        Map<String, Trainer> trainers, TrainingScheduler scheduler, PreferenceChangeListener preferenceChangeListener) {
     this.conf = conf;
     this.storage = storage;
     names = Sets.newHashSet(recommenders.keySet());
     this.recommenders = recommenders;
     this.trainers = trainers;
     this.scheduler = scheduler;
+    this.preferenceChangeListener = preferenceChangeListener;
   }
 
   public static synchronized void init(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
-      Map<String, Trainer> trainers, TrainingScheduler scheduler) {
+      Map<String, Trainer> trainers, TrainingScheduler scheduler, PreferenceChangeListener preferenceChangeListener) {
     Preconditions.checkState(INSTANCE == null);
-    INSTANCE = new Components(conf, storage, recommenders, trainers, scheduler);
+    INSTANCE = new Components(conf, storage, recommenders, trainers, scheduler, preferenceChangeListener);
   }
 
   public static Components instance() {
@@ -59,10 +62,6 @@ public class Components {
 
   public Configuration getConfiguration() {
     return conf;
-  }
-
-  public Iterable<String> configuredRecommenderNames() {
-    return names;
   }
 
   public Recommender recommender(String name) {
@@ -79,5 +78,9 @@ public class Components {
 
   public TrainingScheduler scheduler() {
     return scheduler;
+  }
+
+  public PreferenceChangeListener preferenceChangeListener() {
+    return preferenceChangeListener;
   }
 }

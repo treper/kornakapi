@@ -58,6 +58,7 @@ public class ConfigurationTest {
         "      <numberOfIterations>10</numberOfIterations>\n" +
         "      <lambda>0.01</lambda>\n" +
         "      <alpha>40.0</alpha>\n" +
+        "      <retrainAfterPreferenceChanges>5</retrainAfterPreferenceChanges>\n" +
         "    </factorizationbasedRecommender>\n" +
         "  </factorizationbasedRecommenders>\n" +
 
@@ -82,6 +83,8 @@ public class ConfigurationTest {
     assertEquals("itembased", itembasedRecommenderConf.getName());
     assertEquals(LogLikelihoodSimilarity.class.getName(), itembasedRecommenderConf.getSimilarityClass());
     assertEquals(25, itembasedRecommenderConf.getSimilarItemsPerItem());
+    assertEquals(RecommenderConfig.DONT_RETRAIN_ON_PREFERENCE_CHANGES,
+        itembasedRecommenderConf.getRetrainAfterPreferenceChanges());
     assertEquals("0 0 1 * * ?", itembasedRecommenderConf.getRetrainCronExpression());
 
     List<FactorizationbasedRecommenderConfig> factorizationbasedRecommenders = conf.getFactorizationbasedRecommenders();
@@ -95,6 +98,7 @@ public class ConfigurationTest {
     assertEquals(10, factorizationbasedRecommenderConf.getNumberOfIterations());
     assertEquals(0.01, factorizationbasedRecommenderConf.getLambda(), 0);
     assertEquals(40, factorizationbasedRecommenderConf.getAlpha(), 0);
+    assertEquals(5, factorizationbasedRecommenderConf.getRetrainAfterPreferenceChanges());
     assertNull(factorizationbasedRecommenderConf.getRetrainCronExpression());
   }
 
@@ -127,6 +131,7 @@ public class ConfigurationTest {
     factorizationbasedRecommenderConf.setUsesImplicitFeedback(true);
     factorizationbasedRecommenderConf.setLambda(0.01);
     factorizationbasedRecommenderConf.setAlpha(40);
+    factorizationbasedRecommenderConf.setRetrainAfterPreferenceChanges(5);
 
     conf.addFactorizationbasedRecommender(factorizationbasedRecommenderConf);
 

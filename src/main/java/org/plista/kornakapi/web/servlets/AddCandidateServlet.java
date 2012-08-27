@@ -30,6 +30,6 @@ public class AddCandidateServlet extends BaseServlet {
     String label = getParameter(request, Parameters.LABEL, true);
     long itemID = getParameterAsLong(request, Parameters.ITEM_ID, true);
 
-    getStorage().addCandidate(label, itemID);
+    storage().addCandidate(label, itemID);
   }
 }
