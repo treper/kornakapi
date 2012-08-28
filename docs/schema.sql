@@ -9,7 +9,6 @@ CREATE TABLE  `taste_preferences` (
 CREATE TABLE  `taste_candidates` (
   `label` varchar(255) NOT NULL,
   `item_id` bigint(20) NOT NULL,
-  PRIMARY KEY (`label`,`item_id`),
-  KEY `item_id` (`item_id`)
+  PRIMARY KEY (`label`,`item_id`)
 );
 
