@@ -54,7 +54,7 @@ public class MultithreadedItembasedInMemoryTrainer extends AbstractTrainer {
   protected void doTrain(File targetFile, DataModel inmemoryData, int numProcessors) throws IOException {
     BufferedWriter writer = null;
 
-    ExecutorService executorService = Executors.newFixedThreadPool(numProcessors);
+    ExecutorService executorService = Executors.newFixedThreadPool(numProcessors + 1);
 
     try {
 
@@ -75,8 +75,8 @@ public class MultithreadedItembasedInMemoryTrainer extends AbstractTrainer {
       BlockingQueue<long[]> itemsIDsToProcess = new LinkedBlockingQueue<long[]>(itemIDBatches);
       BlockingQueue<String> output = new LinkedBlockingQueue<String>();
 
-      AtomicInteger numActiveWorkers = new AtomicInteger(numProcessors - 1);
-      for (int n = 0; n < numProcessors - 1; n++) {
+      AtomicInteger numActiveWorkers = new AtomicInteger(numProcessors);
+      for (int n = 0; n < numProcessors; n++) {
         executorService.execute(new SimilarItemsWorker(n, itemsIDsToProcess, output, trainer,
             conf.getSimilarItemsPerItem(), numActiveWorkers));
       }
