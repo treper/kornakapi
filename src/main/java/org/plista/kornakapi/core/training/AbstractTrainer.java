@@ -32,15 +32,16 @@ public abstract class AbstractTrainer implements Trainer {
   }
 
   @Override
-  public void train(File modelDirectory, Storage storage, Recommender recommender) throws IOException {
+  public void train(File modelDirectory, Storage storage, Recommender recommender, int numProcessors)
+      throws IOException {
 
     File targetFile = new File(modelDirectory, conf.getName() + "-training.model");
 
-    doTrain(targetFile, storage.trainingData());
+    doTrain(targetFile, storage.trainingData(), numProcessors);
 
     targetFile.renameTo(new File(modelDirectory, conf.getName() + ".model"));
     recommender.refresh(null);
   }
 
-  protected abstract void doTrain(File targetFile, DataModel inmemoryData) throws IOException;
+  protected abstract void doTrain(File targetFile, DataModel inmemoryData, int numProcessors) throws IOException;
 }

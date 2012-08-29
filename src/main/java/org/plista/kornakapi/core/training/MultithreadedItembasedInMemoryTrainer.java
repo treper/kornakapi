@@ -51,9 +51,9 @@ public class MultithreadedItembasedInMemoryTrainer extends AbstractTrainer {
   }
 
   @Override
-  protected void doTrain(File targetFile, DataModel inmemoryData) throws IOException {
+  protected void doTrain(File targetFile, DataModel inmemoryData, int numProcessors) throws IOException {
     BufferedWriter writer = null;
-    int numProcessors = Runtime.getRuntime().availableProcessors();
+
     ExecutorService executorService = Executors.newFixedThreadPool(numProcessors);
 
     try {

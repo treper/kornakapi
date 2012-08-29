@@ -15,7 +15,7 @@
 
 package org.plista.kornakapi.web.servlets;
 
-import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.plista.kornakapi.core.training.preferencechanges.PreferenceChangeListener;
@@ -25,14 +25,17 @@ import org.plista.kornakapi.web.MissingParameterException;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import java.util.regex.Pattern;
 
 public abstract class BaseServlet extends HttpServlet {
+
+  private static final Pattern ITEM_ID_SEPARATOR = Pattern.compile(",");
 
   private Components getComponents() {
     return Components.instance();
   }
 
-  protected Recommender recommender(String name) {
+  protected KornakapiRecommender recommender(String name) {
     return getComponents().recommender(name);
   }
 
@@ -70,6 +73,23 @@ public abstract class BaseServlet extends HttpServlet {
     } catch (NumberFormatException e) {
       throw new InvalidParameterException("Unable to parse parameter [" + name + "]", e);
     }
+  }
+
+  protected long[] getParameterAsLongArray(HttpServletRequest request, String name) {
+    String param = getParameter(request, name, false);
+
+    String[] tokens = ITEM_ID_SEPARATOR.split(param);
+    long[] itemIDs = new long[tokens.length];
+
+    for (int n = 0; n < itemIDs.length; n++) {
+      try {
+        itemIDs[n] = Long.parseLong(tokens[n]);
+      } catch (NumberFormatException e) {
+        throw new InvalidParameterException("Unable to parse parameter [" + name + "]", e);
+      }
+    }
+
+    return itemIDs;
   }
 
   protected float getParameterAsFloat(HttpServletRequest request, String name, boolean required) {

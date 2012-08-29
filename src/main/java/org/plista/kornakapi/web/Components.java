@@ -16,8 +16,8 @@
 package org.plista.kornakapi.web;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.Trainer;
@@ -30,27 +30,26 @@ public class Components {
 
   private final Configuration conf;
   private final Storage storage;
-  private final Iterable<String> names;
-  private final Map<String, Recommender> recommenders;
+  private final Map<String, KornakapiRecommender> recommenders;
   private final Map<String, Trainer> trainers;
   private final TrainingScheduler scheduler;
   private final PreferenceChangeListener preferenceChangeListener;
 
   private static Components INSTANCE;
 
-  private Components(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
+  private Components(Configuration conf, Storage storage, Map<String, KornakapiRecommender> recommenders,
         Map<String, Trainer> trainers, TrainingScheduler scheduler, PreferenceChangeListener preferenceChangeListener) {
     this.conf = conf;
     this.storage = storage;
-    names = Sets.newHashSet(recommenders.keySet());
     this.recommenders = recommenders;
     this.trainers = trainers;
     this.scheduler = scheduler;
     this.preferenceChangeListener = preferenceChangeListener;
   }
 
-  public static synchronized void init(Configuration conf, Storage storage, Map<String, Recommender> recommenders,
-      Map<String, Trainer> trainers, TrainingScheduler scheduler, PreferenceChangeListener preferenceChangeListener) {
+  public static synchronized void init(Configuration conf, Storage storage,
+      Map<String, KornakapiRecommender> recommenders, Map<String, Trainer> trainers, TrainingScheduler scheduler,
+      PreferenceChangeListener preferenceChangeListener) {
     Preconditions.checkState(INSTANCE == null);
     INSTANCE = new Components(conf, storage, recommenders, trainers, scheduler, preferenceChangeListener);
   }
@@ -64,7 +63,7 @@ public class Components {
     return conf;
   }
 
-  public Recommender recommender(String name) {
+  public KornakapiRecommender recommender(String name) {
     return recommenders.get(name);
   }
 

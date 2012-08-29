@@ -16,27 +16,27 @@
 package org.plista.kornakapi.web.servlets;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.recommender.AllSimilarItemsCandidateItemsStrategy;
-import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
 import org.apache.mahout.cf.taste.impl.recommender.svd.FilePersistenceStrategy;
 import org.apache.mahout.cf.taste.impl.recommender.svd.PersistenceStrategy;
 import org.apache.mahout.cf.taste.impl.similarity.file.FileItemSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
-import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
-import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
+import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.config.RecommenderConfig;
 import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
-import org.plista.kornakapi.core.recommender.FactorizationbasedRecommender;
+import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
+import org.plista.kornakapi.core.recommender.ItemSimilarityBasedRecommender;
 import org.plista.kornakapi.core.storage.CandidateCacheStorageDecorator;
 import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.storage.Storage;
@@ -58,20 +58,30 @@ import java.util.Map;
 
 public class BigBangServletContextListener implements ServletContextListener {
 
+  private static final String CONFIG_PROPERTY = "kornakapi.conf";
+
   private static final Logger log = LoggerFactory.getLogger(BigBangServletContextListener.class);
 
   @Override
   public void contextInitialized(ServletContextEvent event) {
     try {
 
-      String xml = Files.toString(new File("/home/ssc/Desktop/plista/test.conf"), Charsets.UTF_8);
-      Configuration conf = Configuration.fromXML(xml);
+      String configFileLocation = System.getProperty(CONFIG_PROPERTY);
+      Preconditions.checkState(configFileLocation != null, "configuration file not set!");
+
+      File configFile = new File(configFileLocation);
+      Preconditions.checkState(configFile.exists() && configFile.canRead(),
+          "configuration file not found or not readable");
+
+      Configuration conf = Configuration.fromXML(Files.toString(configFile, Charsets.UTF_8));
+
+      Preconditions.checkState(conf.getNumProcessorsForTraining() > 0, "need at least one processor for training!");
 
       Storage storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
 
       DataModel persistentData = storage.recommenderData();
 
-      Map<String, Recommender> recommenders = Maps.newHashMap();
+      Map<String, KornakapiRecommender> recommenders = Maps.newHashMap();
       Map<String, Trainer> trainers = Maps.newHashMap();
 
       TrainingScheduler scheduler = new TrainingScheduler();
@@ -93,7 +103,7 @@ public class BigBangServletContextListener implements ServletContextListener {
         ItemSimilarity itemSimilarity = new FileItemSimilarity(modelFile);
         AllSimilarItemsCandidateItemsStrategy allSimilarItemsStrategy =
             new AllSimilarItemsCandidateItemsStrategy(itemSimilarity);
-        ItemBasedRecommender recommender = new GenericItemBasedRecommender(persistentData, itemSimilarity,
+        KornakapiRecommender recommender = new ItemSimilarityBasedRecommender(persistentData, itemSimilarity,
             allSimilarItemsStrategy, allSimilarItemsStrategy);
 
         recommenders.put(name, recommender);
@@ -131,7 +141,7 @@ public class BigBangServletContextListener implements ServletContextListener {
         CandidateItemsStrategy allUnknownItemsStrategy =
             new CachingAllUnknownItemsCandidateItemsStrategy(persistentData);
 
-        FactorizationbasedRecommender svdRecommender = new FactorizationbasedRecommender(persistentData,
+        FoldingFactorizationBasedRecommender svdRecommender = new FoldingFactorizationBasedRecommender(persistentData,
             allUnknownItemsStrategy, persistence);
 
         recommenders.put(name, svdRecommender);

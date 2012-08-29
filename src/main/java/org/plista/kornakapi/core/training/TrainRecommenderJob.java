@@ -43,7 +43,7 @@ public class TrainRecommenderJob implements Job {
     log.info("Training for recommender [{}] started.", recommenderName);
     try {
       trainer.train(new File(components.getConfiguration().getModelDirectory()), components.storage(),
-          components.recommender(recommenderName));
+          components.recommender(recommenderName), components.getConfiguration().getNumProcessorsForTraining());
     } catch (IOException e) {
       log.warn("Training of recommender [" + recommenderName + "] failed!", e);
     }

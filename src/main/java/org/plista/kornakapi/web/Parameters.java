@@ -19,6 +19,7 @@ public class Parameters {
 
   public static final String RECOMMENDER = "recommender";
   public static final String USER_ID = "userID";
+  public static final String ITEM_IDS = "itemIDs";
   public static final String ITEM_ID = "itemID";
   public static final String VALUE = "value";
   public static final String HOW_MANY = "howMany";

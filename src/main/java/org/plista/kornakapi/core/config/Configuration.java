@@ -23,6 +23,8 @@ import java.util.List;
 public class Configuration {
 
   private String modelDirectory;
+  private int numProcessorsForTraining;
+
   private StorageConfiguration storageConfiguration;
 
   private List<ItembasedRecommenderConfig> itembasedRecommenders = Lists.newArrayList();
@@ -67,5 +69,13 @@ public class Configuration {
 
   public void setStorageConfiguration(StorageConfiguration storageConfiguration) {
     this.storageConfiguration = storageConfiguration;
+  }
+
+  public int getNumProcessorsForTraining() {
+    return numProcessorsForTraining;
+  }
+
+  public void setNumProcessorsForTraining(int numProcessorsForTraining) {
+    this.numProcessorsForTraining = numProcessorsForTraining;
   }
 }

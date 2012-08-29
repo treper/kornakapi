@@ -16,10 +16,12 @@
 package org.plista.kornakapi.core.recommender;
 
 import com.google.common.base.Preconditions;
+import org.apache.mahout.cf.taste.common.NoSuchItemException;
 import org.apache.mahout.cf.taste.common.Refreshable;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.impl.common.RefreshHelper;
+import org.apache.mahout.cf.taste.impl.model.BooleanUserPreferenceArray;
 import org.apache.mahout.cf.taste.impl.recommender.AbstractRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.TopItems;
 import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
@@ -29,6 +31,7 @@ import org.apache.mahout.cf.taste.model.PreferenceArray;
 import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
+import org.plista.kornakapi.KornakapiRecommender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,28 +40,26 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-public final class FactorizationbasedRecommender extends AbstractRecommender {
+public final class FoldingFactorizationBasedRecommender extends AbstractRecommender implements KornakapiRecommender {
 
-  private Factorization factorization;
+  private FoldingFactorization foldingFactorization;
   private final PersistenceStrategy persistenceStrategy;
   private final RefreshHelper refreshHelper;
 
-  private final CandidateItemsStrategy candidateItemsStrategy;
+  private static final Logger log = LoggerFactory.getLogger(FoldingFactorizationBasedRecommender.class);
 
-  private static final Logger log = LoggerFactory.getLogger(FactorizationbasedRecommender.class);
-
-  public FactorizationbasedRecommender(DataModel dataModel, CandidateItemsStrategy candidateItemsStrategy,
-                                       PersistenceStrategy persistenceStrategy) throws TasteException {
+  public FoldingFactorizationBasedRecommender(DataModel dataModel, CandidateItemsStrategy candidateItemsStrategy,
+      PersistenceStrategy persistenceStrategy) throws TasteException {
     super(dataModel, candidateItemsStrategy);
 
     this.persistenceStrategy = Preconditions.checkNotNull(persistenceStrategy);
     try {
-      factorization = persistenceStrategy.load();
+      Factorization factorization = persistenceStrategy.load();
+      Preconditions.checkNotNull(factorization, "PersistenceStrategy must provide an initial factorization");
+      foldingFactorization = new FoldingFactorization(factorization);
     } catch (IOException e) {
       throw new TasteException("Error loading factorization", e);
     }
-
-    Preconditions.checkNotNull(factorization, "PersistenceStrategy must provide an initial factorization");
 
     refreshHelper = new RefreshHelper(new Callable<Object>() {
       @Override
@@ -69,13 +70,12 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
     });
     refreshHelper.addDependency(getDataModel());
     refreshHelper.addDependency(candidateItemsStrategy);
-
-    this.candidateItemsStrategy = candidateItemsStrategy;
   }
 
   private void reloadFactorization() throws TasteException {
     try {
-      factorization = Preconditions.checkNotNull(persistenceStrategy.load());
+      Factorization factorization = Preconditions.checkNotNull(persistenceStrategy.load());
+      foldingFactorization = new FoldingFactorization(factorization);
     } catch (IOException e) {
       throw new TasteException("Error reloading factorization", e);
     }
@@ -98,13 +98,49 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
 
   @Override
   public float estimatePreference(long userID, long itemID) throws TasteException {
-    double[] userFeatures = factorization.getUserFeatures(userID);
-    double[] itemFeatures = factorization.getItemFeatures(itemID);
-    double estimate = 0;
+    double[] userFeatures = foldingFactorization.factorization().getUserFeatures(userID);
+    double[] itemFeatures = foldingFactorization.factorization().getItemFeatures(itemID);
+
+    return (float) dotProduct(userFeatures, itemFeatures);
+  }
+
+  private float estimatePreferenceForAnonymous(double[] foldedInUserFeatures, long itemID) throws NoSuchItemException {
+    double[] itemFeatures = foldingFactorization.factorization().getItemFeatures(itemID);
+
+    return (float) dotProduct(foldedInUserFeatures, itemFeatures);
+  }
+
+  private double dotProduct(double[] userFeatures, double[] itemFeatures) {
+    double dot = 0;
     for (int feature = 0; feature < userFeatures.length; feature++) {
-      estimate += userFeatures[feature] * itemFeatures[feature];
+      dot += userFeatures[feature] * itemFeatures[feature];
     }
-    return (float) estimate;
+    return dot;
+  }
+
+  @Override
+  public List<RecommendedItem> recommendToAnonymous(long[] itemIDs, int howMany, IDRescorer rescorer)
+      throws TasteException {
+
+    //TODO what to do here in the non-implicit case? choose a rating?
+    PreferenceArray preferences = asPreferences(itemIDs);
+    double[] foldedInUserFeatures = foldingFactorization.foldInUser(itemIDs);
+
+    FastIDSet possibleItemIDs = getAllOtherItems(Long.MIN_VALUE, preferences);
+
+    List<RecommendedItem> topItems = TopItems.getTopItems(howMany, possibleItemIDs.iterator(), rescorer,
+        new AnonymousEstimator(foldedInUserFeatures));
+    log.debug("Recommendations are: {}", topItems);
+
+    return topItems;
+  }
+
+  private PreferenceArray asPreferences(long[] itemIDs) {
+    PreferenceArray preferences = new BooleanUserPreferenceArray(itemIDs.length);
+    for (int n = 0; n < itemIDs.length; n++) {
+      preferences.setItemID(n, itemIDs[n]);
+    }
+    return preferences;
   }
 
   private final class Estimator implements TopItems.Estimator<Long> {
@@ -118,6 +154,20 @@ public final class FactorizationbasedRecommender extends AbstractRecommender {
     @Override
     public double estimate(Long itemID) throws TasteException {
       return estimatePreference(theUserID, itemID);
+    }
+  }
+
+  private final class AnonymousEstimator implements TopItems.Estimator<Long> {
+
+    private final double[] foldedInUserFeatures;
+
+    private AnonymousEstimator(double[] foldedInUserFeatures) {
+      this.foldedInUserFeatures = foldedInUserFeatures;
+    }
+
+    @Override
+    public double estimate(Long itemID) throws TasteException {
+      return estimatePreferenceForAnonymous(foldedInUserFeatures, itemID);
     }
   }
 

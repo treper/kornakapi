@@ -33,6 +33,7 @@ public class ConfigurationTest {
         "<configuration>\n" +
 
         "  <modelDirectory>/tmp/models</modelDirectory>\n" +
+        "  <numProcessorsForTraining>3</numProcessorsForTraining>\n" +
 
         "  <storageConfiguration>\n" +
         "    <jdbcDriverClass>com.mysql.jdbc.Driver</jdbcDriverClass>\n" +
@@ -67,6 +68,7 @@ public class ConfigurationTest {
     Configuration conf = Configuration.fromXML(xml);
 
     assertEquals("/tmp/models", conf.getModelDirectory());
+    assertEquals(3, conf.getNumProcessorsForTraining());
 
     StorageConfiguration storageConf = conf.getStorageConfiguration();
     assertNotNull(storageConf);
@@ -115,6 +117,7 @@ public class ConfigurationTest {
 
     conf.setModelDirectory("/tmp/models");
     conf.setStorageConfiguration(storageConf);
+    conf.setNumProcessorsForTraining(3);
 
     ItembasedRecommenderConfig itembasedRecommenderConf = new ItembasedRecommenderConfig();
     itembasedRecommenderConf.setName("itembased");

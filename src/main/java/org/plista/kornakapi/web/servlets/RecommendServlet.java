@@ -19,7 +19,7 @@ import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.recommender.FixedCandidatesIDRescorer;
 import org.plista.kornakapi.web.Parameters;
 import org.slf4j.Logger;
@@ -40,7 +40,6 @@ public class RecommendServlet extends BaseServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
     String recommenderName = getParameter(request, Parameters.RECOMMENDER, true);
-    long userID = getParameterAsLong(request, Parameters.USER_ID, false);
     int howMany = getParameterAsInt(request, Parameters.HOW_MANY, Parameters.DEFAULT_HOW_MANY);
 
     IDRescorer rescorer = null;
@@ -54,10 +53,31 @@ public class RecommendServlet extends BaseServlet {
       }
     }
 
-    Recommender recommender = recommender(recommenderName);
+    KornakapiRecommender recommender = recommender(recommenderName);
 
     try {
-      List<RecommendedItem> recommendedItems = recommender.recommend(userID, howMany, rescorer);
+      List<RecommendedItem> recommendedItems;
+
+      if (hasParameter(request, Parameters.USER_ID)) {
+        long userID = getParameterAsLong(request, Parameters.USER_ID, false);
+
+        recommendedItems = recommender.recommend(userID, howMany, rescorer);
+
+        if (log.isDebugEnabled()) {
+          log.debug("{} recommendations for user {}", recommendedItems.size(), userID);
+        }
+      } else if (hasParameter(request, Parameters.ITEM_IDS)) {
+        long[] itemIDs = getParameterAsLongArray(request, Parameters.ITEM_IDS);
+
+        recommendedItems = recommender.recommendToAnonymous(itemIDs, howMany, rescorer);
+
+        if (log.isDebugEnabled()) {
+          log.debug("{} recommendations for anonymous user", recommendedItems.size());
+        }
+      } else {
+        throw new IllegalStateException("Parameter [" + Parameters.USER_ID + "] or [" + Parameters.ITEM_IDS + "] " +
+            "must be supplied!");
+      }
 
       PrintWriter writer = response.getWriter();
 
@@ -75,11 +95,6 @@ public class RecommendServlet extends BaseServlet {
         separator = ",";
       }
       writer.write("]");
-
-      if (log.isDebugEnabled()) {
-        log.debug("{} recommendations for user {} using recommender {}",
-            new Object[] { recommendedItems.size(), userID, recommenderName });
-      }
 
     } catch (TasteException e) {
       throw new ServletException(e);

@@ -13,15 +13,27 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  */
 
-package org.plista.kornakapi.core.training;
+package org.plista.kornakapi.core.recommender;
 
-import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.plista.kornakapi.core.storage.Storage;
+import org.apache.mahout.cf.taste.recommender.IDRescorer;
+import org.apache.mahout.cf.taste.recommender.Rescorer;
+import org.apache.mahout.common.LongPair;
 
-import java.io.File;
-import java.io.IOException;
+public class FilteringLongPairRescorer implements Rescorer<LongPair> {
 
-public interface Trainer {
+  private final IDRescorer rescorer;
 
-  void train(File modelDirectory, Storage storage, Recommender recommender, int numProcessors) throws IOException;
+  public FilteringLongPairRescorer(IDRescorer rescorer) {
+    this.rescorer = rescorer;
+  }
+
+  @Override
+  public double rescore(LongPair thing, double originalScore) {
+    return originalScore;
+  }
+
+  @Override
+  public boolean isFiltered(LongPair pair) {
+    return rescorer.isFiltered(pair.getFirst());
+  }
 }

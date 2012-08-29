@@ -13,15 +13,17 @@
  *  See the License for the specific language governing permissions and limitations under the License.
  */
 
-package org.plista.kornakapi.core.training;
+package org.plista.kornakapi;
 
+import org.apache.mahout.cf.taste.common.TasteException;
+import org.apache.mahout.cf.taste.recommender.IDRescorer;
+import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.plista.kornakapi.core.storage.Storage;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
-public interface Trainer {
+public interface KornakapiRecommender extends Recommender {
 
-  void train(File modelDirectory, Storage storage, Recommender recommender, int numProcessors) throws IOException;
+  public List<RecommendedItem> recommendToAnonymous(long[] itemIDs, int howMany, IDRescorer rescorer)
+      throws TasteException;
 }
