@@ -18,6 +18,7 @@ package org.plista.kornakapi.core.recommender;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 
+/** an {@link IDRescorer} that filters all items not in a given candidate set */
 public class FixedCandidatesIDRescorer implements IDRescorer {
 
   private final FastIDSet candidates;

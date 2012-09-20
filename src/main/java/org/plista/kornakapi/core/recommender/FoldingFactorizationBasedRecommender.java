@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+/** a matrix factorization based recommender that supports folding in new users */
 public final class FoldingFactorizationBasedRecommender extends AbstractRecommender implements KornakapiRecommender {
 
   private FoldingFactorization foldingFactorization;

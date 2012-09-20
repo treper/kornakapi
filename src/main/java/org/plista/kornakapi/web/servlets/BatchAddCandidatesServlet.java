@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
+/** servlet to add items to a candidate set in batch */
 public class BatchAddCandidatesServlet extends BaseServlet {
 
   @Override

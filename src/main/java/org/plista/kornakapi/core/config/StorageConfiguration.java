@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core.config;
 
+/** configuration for the database backend */
 public class StorageConfiguration {
 
   private String jdbcDriverClass;

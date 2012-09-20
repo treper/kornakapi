@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+/** servlet context listener to initialize/shut down the application */
 public class BigBangServletContextListener implements ServletContextListener {
 
   private static final String CONFIG_PROPERTY = "kornakapi.conf";

@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.Iterator;
 
 /**
+ * a decorator for a {@link Storage} that caches the underlying candidate sets
+ *
  * http://code.google.com/p/guava-libraries/wiki/CachesExplained
  */
 public class CandidateCacheStorageDecorator implements Storage {

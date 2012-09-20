@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
+/** an {@link java.util.Iterator} over candidates stored in a text file */
 public class CSVCandidateFileIterator extends UnmodifiableIterator<Candidate> {
 
   private final FileLineIterator lineIterator;

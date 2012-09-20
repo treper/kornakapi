@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Set;
 
+/** an implementation of {@link Storage} for MySQL */
 public class MySqlStorage implements Storage {
 
   private final BasicDataSource dataSource;

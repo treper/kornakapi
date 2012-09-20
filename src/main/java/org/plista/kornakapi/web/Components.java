@@ -26,6 +26,7 @@ import org.plista.kornakapi.core.training.preferencechanges.PreferenceChangeList
 
 import java.util.Map;
 
+/** all singleton instances used in the application, used for dependency injection */
 public class Components {
 
   private final Configuration conf;

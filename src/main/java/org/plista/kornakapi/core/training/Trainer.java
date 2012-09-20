@@ -21,6 +21,7 @@ import org.plista.kornakapi.core.storage.Storage;
 import java.io.File;
 import java.io.IOException;
 
+/** train a recommender */
 public interface Trainer {
 
   void train(File modelDirectory, Storage storage, Recommender recommender, int numProcessors) throws IOException;

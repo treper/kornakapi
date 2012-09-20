@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 
 import java.util.List;
 
+/** a {@link PreferenceChangeListener} that delegates to several other listeners */
 public class DelegatingPreferenceChangeListener implements PreferenceChangeListener {
 
   private final List<PreferenceChangeListener> delegates = Lists.newArrayList();

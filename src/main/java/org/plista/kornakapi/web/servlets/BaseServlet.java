@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.util.regex.Pattern;
 
+/** base class for all servlets */
 public abstract class BaseServlet extends HttpServlet {
 
   private static final Pattern ITEM_ID_SEPARATOR = Pattern.compile(",");

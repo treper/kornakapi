@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 
+/** a {@link Job} to train a recommender */
 public class TrainRecommenderJob implements Job {
 
   public static final String RECOMMENDER_NAME_PARAM = TrainRecommenderJob.class.getName() + ".recommenderName";

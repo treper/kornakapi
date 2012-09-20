@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core.config;
 
+/** configuration for recommenders that use matrix factorization */
 public class FactorizationbasedRecommenderConfig extends RecommenderConfig {
 
   private boolean usesImplicitFeedback;

@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.web;
 
+/** signals invalid parameters */
 public class InvalidParameterException extends RuntimeException {
 
   public InvalidParameterException(String message, Throwable cause) {

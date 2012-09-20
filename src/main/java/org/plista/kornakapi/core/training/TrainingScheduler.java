@@ -31,6 +31,7 @@ import org.quartz.spi.ThreadPool;
 import java.io.Closeable;
 import java.io.IOException;
 
+/** a class to schedule the training of recommenders */
 public class TrainingScheduler implements Closeable {
 
   private final Scheduler scheduler;

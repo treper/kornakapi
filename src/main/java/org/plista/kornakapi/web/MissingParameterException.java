@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.web;
 
+/** signals missing parameters */
 public class MissingParameterException extends RuntimeException {
 
   public MissingParameterException(String message) {

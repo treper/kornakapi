@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Pattern;
 
-
+/** an {@link java.util.Iterator} over preferences stored in a text file */
 public class CSVPreferenceFileIterator extends UnmodifiableIterator<Preference> {
 
   private final FileLineIterator lineIterator;

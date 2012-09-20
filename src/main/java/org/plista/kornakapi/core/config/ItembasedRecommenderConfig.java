@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core.config;
 
+/** configuration for recommenders that use item kNN */
 public class ItembasedRecommenderConfig extends RecommenderConfig {
 
   private String similarityClass;

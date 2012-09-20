@@ -17,6 +17,7 @@ package org.plista.kornakapi.core;
 
 import org.apache.mahout.cf.taste.model.Preference;
 
+/** implementation of {@link Preference}, the framework might reuse this instance */
 public class MutablePreference implements Preference {
 
   private long userID;

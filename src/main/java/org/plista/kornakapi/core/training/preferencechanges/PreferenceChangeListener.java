@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core.training.preferencechanges;
 
+/** a class to react on preference changes */
 public interface PreferenceChangeListener {
   void notifyOfPreferenceChange();
 }

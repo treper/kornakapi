@@ -39,6 +39,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/** a multi-threaded trainer for item kNN recommenders */
 public class MultithreadedItembasedInMemoryTrainer extends AbstractTrainer {
 
   private final ItembasedRecommenderConfig conf;

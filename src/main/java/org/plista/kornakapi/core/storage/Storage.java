@@ -24,6 +24,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Iterator;
 
+/** I/O operations for the weblayer */
 public interface Storage extends Closeable {
 
   DataModel trainingData() throws IOException;

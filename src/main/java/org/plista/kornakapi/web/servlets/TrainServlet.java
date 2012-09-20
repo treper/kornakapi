@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/** servlet to manually trigger the training for a recommender */
 public class TrainServlet extends BaseServlet {
 
   @Override

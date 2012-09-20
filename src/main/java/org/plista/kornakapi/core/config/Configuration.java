@@ -20,9 +20,12 @@ import com.thoughtworks.xstream.XStream;
 
 import java.util.List;
 
+/** basic configuration object for the weblayer */
 public class Configuration {
 
+  /** directory to store the models in */
   private String modelDirectory;
+  /** number of cores to use for training */
   private int numProcessorsForTraining;
 
   private StorageConfiguration storageConfiguration;

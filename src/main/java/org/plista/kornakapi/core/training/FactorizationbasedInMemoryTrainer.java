@@ -15,21 +15,16 @@
 
 package org.plista.kornakapi.core.training;
 
-import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.LUDecomposition;
-import org.apache.commons.math.linear.LUDecompositionImpl;
-import org.apache.commons.math.linear.RealMatrix;
 import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer;
 import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
 import org.apache.mahout.cf.taste.impl.recommender.svd.FilePersistenceStrategy;
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.apache.mahout.math.DenseMatrix;
-import org.apache.mahout.math.Matrix;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 
 import java.io.File;
 import java.io.IOException;
 
+/** a {@link Trainer} for matrix factorization based recommenders */
 public class FactorizationbasedInMemoryTrainer extends AbstractTrainer {
 
   private final FactorizationbasedRecommenderConfig conf;
@@ -47,8 +42,6 @@ public class FactorizationbasedInMemoryTrainer extends AbstractTrainer {
           conf.getNumberOfIterations(), conf.isUsesImplicitFeedback(), conf.getAlpha(), numProcessors);
 
       Factorization factorization = factorizer.factorize();
-
-      //computeUserFoldInMatrix(factorization.allItemFeatures());
 
       new FilePersistenceStrategy(targetFile).maybePersist(factorization);
 

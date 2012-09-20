@@ -29,6 +29,7 @@ import org.plista.kornakapi.KornakapiRecommender;
 
 import java.util.List;
 
+/** an item kNN recommender */
 public class ItemSimilarityBasedRecommender extends GenericItemBasedRecommender implements KornakapiRecommender {
 
   public ItemSimilarityBasedRecommender(DataModel dataModel, ItemSimilarity similarity,

@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core;
 
+/** denotes the affinity of an item to a labeld candidate set */
 public interface Candidate {
 
   String getLabel();

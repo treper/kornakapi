@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core;
 
+/** implementation of {@link Candidate}, note that the framework will reuse this instance */
 public class MutableCandidate implements Candidate {
 
   private String label;

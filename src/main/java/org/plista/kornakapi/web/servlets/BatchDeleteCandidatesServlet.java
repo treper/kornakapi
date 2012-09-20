@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
+/** servlet to delete items from a candidate set in batch */
 public class BatchDeleteCandidatesServlet extends BaseServlet {
 
   @Override

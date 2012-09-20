@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.core.config;
 
+/** basic configuration for all recommenders */
 public abstract class RecommenderConfig {
 
   private String name;

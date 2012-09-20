@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
+/** servlet to add preferences in batch */
 public class BatchSetPreferencesServlet extends BaseServlet {
 
   @Override

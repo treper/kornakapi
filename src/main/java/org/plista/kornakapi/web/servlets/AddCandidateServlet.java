@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/** servlet to add items to a candidate set */
 public class AddCandidateServlet extends BaseServlet {
 
   @Override

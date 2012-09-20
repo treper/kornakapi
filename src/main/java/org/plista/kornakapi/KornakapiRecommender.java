@@ -22,6 +22,7 @@ import org.apache.mahout.cf.taste.recommender.Recommender;
 
 import java.util.List;
 
+/** extension of Mahout's recommender to allow recommendation to anonymous users */
 public interface KornakapiRecommender extends Recommender {
 
   public List<RecommendedItem> recommendToAnonymous(long[] itemIDs, int howMany, IDRescorer rescorer)

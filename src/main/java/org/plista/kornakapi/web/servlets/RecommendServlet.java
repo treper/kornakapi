@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+/** servlet to request recommendations */
 public class RecommendServlet extends BaseServlet {
 
   private static final Logger log = LoggerFactory.getLogger(RecommendServlet.class);

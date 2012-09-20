@@ -19,6 +19,7 @@ import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.Rescorer;
 import org.apache.mahout.common.LongPair;
 
+/** a {@link Rescorer} that wraps a filtering {@link IDRescorer} */
 public class FilteringLongPairRescorer implements Rescorer<LongPair> {
 
   private final IDRescorer rescorer;

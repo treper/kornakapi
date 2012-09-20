@@ -23,6 +23,7 @@ import org.plista.kornakapi.core.storage.Storage;
 import java.io.File;
 import java.io.IOException;
 
+/** base class for all in-memory recommender trainers */
 public abstract class AbstractTrainer implements Trainer {
 
   private final RecommenderConfig conf;

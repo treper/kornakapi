@@ -15,6 +15,7 @@
 
 package org.plista.kornakapi.web;
 
+/** GET parameters for the application */
 public class Parameters {
 
   public static final String RECOMMENDER = "recommender";

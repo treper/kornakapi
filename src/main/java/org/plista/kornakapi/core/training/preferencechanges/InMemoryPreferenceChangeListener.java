@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.atomic.AtomicLong;
 
+/**  a simple, transient {@link PreferenceChangeListener} */
 public class InMemoryPreferenceChangeListener implements PreferenceChangeListener{
 
   private final TrainingScheduler scheduler;

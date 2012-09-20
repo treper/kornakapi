@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+/** a {@link CandidateItemsStrategy} that will cache all itemIDs in memory */
 public class CachingAllUnknownItemsCandidateItemsStrategy implements CandidateItemsStrategy {
 
   private DataModel dataModel;

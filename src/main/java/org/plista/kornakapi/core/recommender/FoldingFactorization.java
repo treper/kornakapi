@@ -23,6 +23,7 @@ import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** a matrix factorization that supports folding in new users */
 public class FoldingFactorization {
 
   private final Factorization factorization;

@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/** servlet to delete items from a candidate set */
 public class DeleteCandidateServlet extends BaseServlet {
 
   @Override
