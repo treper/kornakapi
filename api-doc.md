@@ -35,3 +35,7 @@ remove an item from a labeled candidate set:
 remove items from labeled candidate sets in batch via POSTing a file:
 
 `batchDeleteCandidates?batchSize=<>`
+
+remove all items from a labeled candidate set
+
+`deleteAllCandidates?label=<>`

@@ -54,6 +54,9 @@ public class MySqlStorage implements Storage {
   private static final String REMOVE_CANDIDATE_QUERY =
       "DELETE FROM taste_candidates WHERE label = ? AND item_id = ?";
 
+  private static final String REMOVE_ALL_CANDIDATES_QUERY =
+      "DELETE FROM taste_candidates WHERE label = ?";
+
   private static final String GET_CANDIDATES_QUERY =
       "SELECT item_id FROM taste_candidates WHERE label = ?";
 
@@ -219,6 +222,27 @@ public class MySqlStorage implements Storage {
 
       stmt.setString(1, label);
       stmt.setLong(2, itemID);
+
+      stmt.execute();
+
+    } catch (SQLException e) {
+      throw new IOException(e);
+    } finally {
+      IOUtils.quietClose(stmt);
+      IOUtils.quietClose(conn);
+    }
+  }
+
+  @Override
+  public void deleteAllCandidates(String label) throws IOException {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+
+    try {
+      conn = dataSource.getConnection();
+      stmt = conn.prepareStatement(REMOVE_ALL_CANDIDATES_QUERY);
+
+      stmt.setString(1, label);
 
       stmt.execute();
 

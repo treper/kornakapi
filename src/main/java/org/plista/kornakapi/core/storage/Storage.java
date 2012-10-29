@@ -43,5 +43,7 @@ public interface Storage extends Closeable {
 
   Iterable<String> batchDeleteCandidates(Iterator<Candidate> candidates, int batchSize) throws IOException;
 
+  void deleteAllCandidates(String label) throws IOException;
+
   FastIDSet getCandidates(String label) throws IOException;
 }

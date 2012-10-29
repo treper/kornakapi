@@ -105,6 +105,12 @@ public class CandidateCacheStorageDecorator implements Storage {
     return modifiedLabels;
   }
 
+  @Override
+  public void deleteAllCandidates(String label) throws IOException {
+    delegate.deleteAllCandidates(label);
+    invalidateCache(label);
+  }
+
   //TODO ideally other calls with to an equal uncached label should block and wait for a single retrieval
   @Override
   public FastIDSet getCandidates(String label) throws IOException {
