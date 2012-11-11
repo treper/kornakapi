@@ -9,6 +9,17 @@
   <version>1.0</version>
   <packaging>war</packaging>
 
+  <repositories>
+    <repository>
+      <id>apache</id>
+      <url>https://repository.apache.org/content/groups/public/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.springframework.version>3.1.2.RELEASE</org.springframework.version>
