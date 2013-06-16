@@ -48,10 +48,7 @@ public class RecommendServlet extends BaseServlet {
     if (hasParameter(request, Parameters.LABEL)) {
       String label = getParameter(request, Parameters.LABEL, false);
       FastIDSet candidates = storage().getCandidates(label);
-
-      if (!candidates.isEmpty()) {
-        rescorer = new FixedCandidatesIDRescorer(candidates);
-      }
+      rescorer = new FixedCandidatesIDRescorer(candidates);
     }
 
     KornakapiRecommender recommender = recommender(recommenderName);

@@ -35,6 +35,6 @@ public class FilteringLongPairRescorer implements Rescorer<LongPair> {
 
   @Override
   public boolean isFiltered(LongPair pair) {
-    return rescorer.isFiltered(pair.getFirst());
+    return rescorer.isFiltered(pair.getSecond());
   }
 }
