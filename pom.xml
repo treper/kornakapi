@@ -24,7 +24,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <org.springframework.version>3.1.2.RELEASE</org.springframework.version>
     <org.slf4j.version>1.6.1</org.slf4j.version>
-    <org.apache.mahout.version>0.8-SNAPSHOT</org.apache.mahout.version>
+    <org.apache.mahout.version>0.8</org.apache.mahout.version>
     <tomcat.version>6.0.29</tomcat.version>
   </properties>
 
