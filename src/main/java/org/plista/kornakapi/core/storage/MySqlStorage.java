@@ -41,7 +41,7 @@ import java.util.Set;
 /** an implementation of {@link Storage} for MySQL */
 public class MySqlStorage implements Storage {
 
-  private final BasicDataSource dataSource;
+  protected final BasicDataSource dataSource;
   private final JDBCDataModel dataModel;
 
   private static final String IMPORT_QUERY =
