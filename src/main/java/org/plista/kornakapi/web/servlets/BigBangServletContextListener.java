@@ -20,6 +20,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
+
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.recommender.AllSimilarItemsCandidateItemsStrategy;
 import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
@@ -38,6 +39,7 @@ import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
 import org.plista.kornakapi.core.recommender.ItemSimilarityBasedRecommender;
 import org.plista.kornakapi.core.storage.CandidateCacheStorageDecorator;
+import org.plista.kornakapi.core.storage.MySqlMaxPersistentStorage;
 import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
@@ -52,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -77,10 +80,15 @@ public class BigBangServletContextListener implements ServletContextListener {
       Configuration conf = Configuration.fromXML(Files.toString(configFile, Charsets.UTF_8));
 
       Preconditions.checkState(conf.getNumProcessorsForTraining() > 0, "need at least one processor for training!");
+      
+      Storage storage;
+      if(conf.getMaxPersistence()){
+    	  storage = new CandidateCacheStorageDecorator(new MySqlMaxPersistentStorage(conf.getStorageConfiguration()));
+      }else{
+    	  storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
+      }
 
-      Storage storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
-
-      DataModel persistentData = storage.recommenderData();
+	DataModel persistentData = storage.recommenderData();
 
       Map<String, KornakapiRecommender> recommenders = Maps.newHashMap();
       Map<String, Trainer> trainers = Maps.newHashMap();

@@ -27,6 +27,9 @@ public class Configuration {
   private String modelDirectory;
   /** number of cores to use for training */
   private int numProcessorsForTraining;
+  
+  /** if true, preference values can only be overwritten by bigger values*/
+  private boolean maxPersistence;
 
   private StorageConfiguration storageConfiguration;
 
@@ -80,5 +83,9 @@ public class Configuration {
 
   public void setNumProcessorsForTraining(int numProcessorsForTraining) {
     this.numProcessorsForTraining = numProcessorsForTraining;
+  }
+  
+  public boolean getMaxPersistence(){
+	  return maxPersistence;
   }
 }
