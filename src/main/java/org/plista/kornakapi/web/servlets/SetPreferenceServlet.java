@@ -42,6 +42,11 @@ public class SetPreferenceServlet extends BaseServlet {
     storage().setPreference(userID, itemID, value);
     preferenceChangeListener().notifyOfPreferenceChange();
   }
+  /**
+   * Method maps ids into int range
+   * @param id
+   * @return long
+   */
   protected long idRemapping(long id){
 	  return Math.abs(id % 2147483647);
   }
