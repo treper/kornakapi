@@ -32,14 +32,17 @@ public class SetPreferenceServlet extends BaseServlet {
     long itemID = getParameterAsLong(request, Parameters.ITEM_ID, true);
     float value = getParameterAsFloat(request, Parameters.VALUE, true);
     if(userID < 0 || userID > 2147483647){
-    	throw new ServletException("UserID outside allowed range(0 - 2147483647)");
+    	userID = this.idRemapping(userID);
     }
     if(itemID < 0 || itemID > 2147483647){
-    	throw new ServletException("itemID outside allowed range(0 - 2147483647)");
+    	itemID = this.idRemapping(itemID);
     }
-    
+   
 
     storage().setPreference(userID, itemID, value);
     preferenceChangeListener().notifyOfPreferenceChange();
+  }
+  protected long idRemapping(long id){
+	  return Math.abs(id % 2147483647);
   }
 }
