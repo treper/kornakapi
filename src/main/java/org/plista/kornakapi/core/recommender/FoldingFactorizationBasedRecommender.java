@@ -87,16 +87,19 @@ public final class FoldingFactorizationBasedRecommender extends AbstractRecommen
     Preconditions.checkArgument(howMany >= 1, "howMany must be at least 1");
     log.debug("Recommending items for user ID '{}'", userID);
 
-    long start = System.currentTimeMillis();
+    long fetchHistoryStart = System.currentTimeMillis();
     PreferenceArray preferencesFromUser = getDataModel().getPreferencesFromUser(userID);
-    long duration = System.currentTimeMillis() - start;
-    
+    long fetchHistoryDuration = System.currentTimeMillis() - fetchHistoryStart;
+        
+    long fetchItemIDsStart = System.currentTimeMillis();
+    FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser);
+    long fetchItemIDsDuration = System.currentTimeMillis() - fetchItemIDsStart;
+
     if (log.isInfoEnabled()) {
-    	log.info("fetched {} interactions of user {} in {} ms", new Object[] { preferencesFromUser.length(), userID, duration });
+    	log.info("fetched {} interactions of user {} in {} ms (itemIDs in {} ms)", 
+    			new Object[] { preferencesFromUser.length(), userID, fetchHistoryDuration, fetchItemIDsDuration });
     }
     
-    FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser);
-
     List<RecommendedItem> topItems = TopItems.getTopItems(howMany, possibleItemIDs.iterator(), rescorer,
         new Estimator(userID));
     log.debug("Recommendations are: {}", topItems);
