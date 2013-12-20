@@ -59,18 +59,22 @@ public class RecommendServlet extends BaseServlet {
       if (hasParameter(request, Parameters.USER_ID)) {
         long userID = getParameterAsLong(request, Parameters.USER_ID, false);
 
+        long start = System.currentTimeMillis();
         recommendedItems = recommender.recommend(userID, howMany, rescorer);
-
+        long duration = System.currentTimeMillis() - start;
+        
         if (log.isDebugEnabled()) {
-          log.debug("{} recommendations for user {}", recommendedItems.size(), userID);
+          log.debug("{} recommendations for user {} in {} ms", new Object[] { recommendedItems.size(), userID, duration });
         }
       } else if (hasParameter(request, Parameters.ITEM_IDS)) {
         long[] itemIDs = getParameterAsLongArray(request, Parameters.ITEM_IDS);
 
+        long start = System.currentTimeMillis();
         recommendedItems = recommender.recommendToAnonymous(itemIDs, howMany, rescorer);
-
+        long duration = System.currentTimeMillis() - start;
+        
         if (log.isDebugEnabled()) {
-          log.debug("{} recommendations for anonymous user", recommendedItems.size());
+          log.debug("{} recommendations for anonymous user in {} ms", recommendedItems.size(), duration);
         }
       } else {
         throw new IllegalStateException("Parameter [" + Parameters.USER_ID + "] or [" + Parameters.ITEM_IDS + "] " +
