@@ -95,13 +95,16 @@ public final class FoldingFactorizationBasedRecommender extends AbstractRecommen
     FastIDSet possibleItemIDs = getAllOtherItems(userID, preferencesFromUser);
     long fetchItemIDsDuration = System.currentTimeMillis() - fetchItemIDsStart;
 
-    if (log.isInfoEnabled()) {
-    	log.info("fetched {} interactions of user {} in {} ms (itemIDs in {} ms)", 
-    			new Object[] { preferencesFromUser.length(), userID, fetchHistoryDuration, fetchItemIDsDuration });
-    }
-    
+    long estimateStart = System.currentTimeMillis();
     List<RecommendedItem> topItems = TopItems.getTopItems(howMany, possibleItemIDs.iterator(), rescorer,
         new Estimator(userID));
+    long estimateDuration = System.currentTimeMillis() - estimateStart;
+    
+    if (log.isInfoEnabled()) {
+    	log.info("fetched {} interactions of user {} in {} ms ({} itemIDs in {} ms, estimation in {} ms)", 
+    			new Object[] { preferencesFromUser.length(), userID, fetchHistoryDuration, possibleItemIDs.size(), fetchItemIDsDuration, estimateDuration });
+    }
+    
     log.debug("Recommendations are: {}", topItems);
 
     return topItems;
