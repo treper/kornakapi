@@ -27,6 +27,10 @@ public class FixedCandidatesIDRescorer implements IDRescorer {
     this.candidates = candidates;
   }
 
+  public long numCandidates() {
+	  return candidates.size();
+  }
+  
   @Override
   public double rescore(long id, double originalScore) {
     return originalScore;

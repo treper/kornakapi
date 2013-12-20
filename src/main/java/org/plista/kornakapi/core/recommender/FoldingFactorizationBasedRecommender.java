@@ -100,9 +100,14 @@ public final class FoldingFactorizationBasedRecommender extends AbstractRecommen
         new Estimator(userID));
     long estimateDuration = System.currentTimeMillis() - estimateStart;
     
+    long numCandidates = -1;
+    if (rescorer != null) {
+    	numCandidates = ((FixedCandidatesIDRescorer) rescorer).numCandidates();
+    }
+    
     if (log.isInfoEnabled()) {
-    	log.info("fetched {} interactions of user {} in {} ms ({} itemIDs in {} ms, estimation in {} ms)", 
-    			new Object[] { preferencesFromUser.length(), userID, fetchHistoryDuration, possibleItemIDs.size(), fetchItemIDsDuration, estimateDuration });
+    	log.info("fetched {} interactions of user {} in {} ms ({} itemIDs in {} ms, estimation of {} in {} ms)", 
+    			new Object[] { preferencesFromUser.length(), userID, fetchHistoryDuration, possibleItemIDs.size(), fetchItemIDsDuration, numCandidates, estimateDuration });
     }
     
     log.debug("Recommendations are: {}", topItems);
