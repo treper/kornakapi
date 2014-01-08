@@ -60,7 +60,7 @@ public class FoldingFactorization {
     return Y.multiply(YTYInverse).getData();
   }
 
-  public double[] foldInUser(long[] itemIDs) throws NoSuchItemException {
+  public double[] foldInUser(long[] itemIDs) {
 
     double[] userFeatures = new double[factorization.numFeatures()];
     for (long itemID : itemIDs) {
