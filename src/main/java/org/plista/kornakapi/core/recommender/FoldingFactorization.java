@@ -64,10 +64,16 @@ public class FoldingFactorization {
 
     double[] userFeatures = new double[factorization.numFeatures()];
     for (long itemID : itemIDs) {
-      int itemIndex = factorization.itemIndex(itemID);
-      for (int feature = 0; feature < factorization.numFeatures(); feature++) {
-        userFeatures[feature] += userFoldInMatrix[itemIndex][feature];
-      }
+    	try{
+	      int itemIndex = factorization.itemIndex(itemID);
+	      for (int feature = 0; feature < factorization.numFeatures(); feature++) {
+	        userFeatures[feature] += userFoldInMatrix[itemIndex][feature];
+	      }
+    	}catch(NoSuchItemException e){
+    	    if (log.isInfoEnabled()) {
+    	        log.info("Item unknown: {}", itemID);
+    	    }
+    	}
     }
 
     return userFeatures;
