@@ -124,7 +124,7 @@ public final class FoldingFactorizationBasedRecommender extends AbstractRecommen
 		userFeatures = foldingFactorization.factorization().getUserFeatures(userID);
 	}catch(NoSuchUserException e){
 	    if (log.isInfoEnabled()) {
-	        log.info("User unknown: {}", itemID);
+	        log.info("User unknown: {}", userID);
 	    }
 	}
     double[] itemFeatures = foldingFactorization.factorization().getItemFeatures(itemID);
