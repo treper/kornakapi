@@ -103,11 +103,11 @@ public class RecommendServlet extends BaseServlet {
 
     } catch (NoSuchUserException e) {
 	    if (log.isInfoEnabled()) {
-	        log.info("{}", e.getMessage());
+	        log.info("Unkown User: {}", e.getMessage());
 	    }
     } catch (NoSuchItemException e) {
 	    if (log.isInfoEnabled()) {
-	        log.info("{}", e.getMessage());
+	        log.info("Unknown Item: {}", e.getMessage());
 	    }
     }catch (TasteException e) {
         throw new ServletException(e);
