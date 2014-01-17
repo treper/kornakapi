@@ -15,6 +15,8 @@
 
 package org.plista.kornakapi.web.servlets;
 
+import org.apache.mahout.cf.taste.common.NoSuchItemException;
+import org.apache.mahout.cf.taste.common.NoSuchUserException;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -98,9 +101,17 @@ public class RecommendServlet extends BaseServlet {
       }
       writer.write("]");
 
-    } catch (TasteException e) {
-      throw new ServletException(e);
-    }
+    } catch (NoSuchUserException e) {
+	    if (log.isInfoEnabled()) {
+	        log.info("{}", e.getMessage());
+	    }
+    } catch (NoSuchItemException e) {
+	    if (log.isInfoEnabled()) {
+	        log.info("{}", e.getMessage());
+	    }
+    }catch (TasteException e) {
+        throw new ServletException(e);
+      }
 
   }
 }
