@@ -119,14 +119,7 @@ public final class FoldingFactorizationBasedRecommender extends AbstractRecommen
 
   @Override
   public float estimatePreference(long userID, long itemID) throws TasteException {
-	double[] userFeatures = null;
-	try{
-		userFeatures = foldingFactorization.factorization().getUserFeatures(userID);
-	}catch(NoSuchUserException e){
-	    if (log.isInfoEnabled()) {
-	        log.info("User unknown: {}", userID);
-	    }
-	}
+	double[] userFeatures = foldingFactorization.factorization().getUserFeatures(userID);
     double[] itemFeatures = foldingFactorization.factorization().getItemFeatures(itemID);
 
     return (float) dotProduct(userFeatures, itemFeatures);
