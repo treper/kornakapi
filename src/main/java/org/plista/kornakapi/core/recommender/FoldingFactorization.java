@@ -60,7 +60,7 @@ public class FoldingFactorization {
     return Y.multiply(YTYInverse).getData();
   }
 
-  public double[] foldInUser(long[] itemIDs) {
+  public double[] foldInUser(long[] itemIDs) throws NoSuchItemException {
 
     double[] userFeatures = new double[factorization.numFeatures()];
     for (long itemID : itemIDs) {
@@ -72,9 +72,13 @@ public class FoldingFactorization {
     	}catch(NoSuchItemException e){
     	    if (log.isInfoEnabled()) {
     	        log.info("Item unknown: {}", itemID);
+    	        if(itemIDs.length == 1){
+    	        	throw new NoSuchItemException("At least one item must be known");
+    	        }
     	    }
     	}
     }
+    
 
     return userFeatures;
   }
