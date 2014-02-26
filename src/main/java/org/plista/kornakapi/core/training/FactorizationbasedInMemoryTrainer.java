@@ -20,6 +20,9 @@ import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
 import org.apache.mahout.cf.taste.impl.recommender.svd.FilePersistenceStrategy;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
+import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +31,7 @@ import java.io.IOException;
 public class FactorizationbasedInMemoryTrainer extends AbstractTrainer {
 
   private final FactorizationbasedRecommenderConfig conf;
+  private static final Logger log = LoggerFactory.getLogger(FactorizationbasedInMemoryTrainer.class);
 
   public FactorizationbasedInMemoryTrainer(FactorizationbasedRecommenderConfig conf) {
     super(conf);
@@ -40,8 +44,14 @@ public class FactorizationbasedInMemoryTrainer extends AbstractTrainer {
 
       ALSWRFactorizer factorizer = new ALSWRFactorizer(inmemoryData, conf.getNumberOfFeatures(), conf.getLambda(),
           conf.getNumberOfIterations(), conf.isUsesImplicitFeedback(), conf.getAlpha(), numProcessors);
-
+      
+      long start = System.currentTimeMillis();
       Factorization factorization = factorizer.factorize();
+      long estimateDuration = System.currentTimeMillis() - start;
+      
+      if (log.isInfoEnabled()) {
+    	  log.info("Model trained in {} ms", estimateDuration);
+      }
 
       new FilePersistenceStrategy(targetFile).maybePersist(factorization);
 
