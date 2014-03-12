@@ -9,6 +9,7 @@ import java.util.Iterator;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.clustering.streaming.cluster.StreamingKMeans;
 import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
+import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
@@ -50,7 +51,8 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		System.out.print("Computed "+centroids.size()+ " clusters \n");	
 		Iterator<Vector> iter =centroids.iterator();
 		while(iter.hasNext()){
-			System.out.print(iter.next().norm(2));
+			Centroid cent = (Centroid) iter.next();
+			System.out.print(cent.getWeight());
 			System.out.print("\n");
 		}
 	}

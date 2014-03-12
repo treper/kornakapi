@@ -44,7 +44,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 	  }
 	
 	 public Matrix getData(){
-		 	FastIDSet userids = this.getQuery(GET_USER);
+		 	FastIDSet userids = this.getQuery(test);
 		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
 		 	FastIDSet allItems = new FastIDSet();
 		 	int dim = userids.size();
