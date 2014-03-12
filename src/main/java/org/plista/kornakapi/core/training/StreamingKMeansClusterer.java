@@ -51,6 +51,7 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		Iterator<Vector> iter =centroids.iterator();
 		while(iter.hasNext()){
 			System.out.print(iter.next().norm(2));
+			System.out.print("\n");
 		}
 	}
 }
