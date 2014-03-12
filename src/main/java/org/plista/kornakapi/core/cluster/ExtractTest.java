@@ -11,7 +11,9 @@ import com.google.common.io.Files;
 public class ExtractTest {
 	
 	public static void main(String [] args){
-		
+		/**
+		 * test class
+		 */
 		String path = args[0];
 		System.out.print(path);
 		
