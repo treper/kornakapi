@@ -58,6 +58,7 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 				maxWeight = weight;
 			}
 		}
+		System.out.print(maxWeight + "\n");
 		iter =centroids.iterator();
 		while(iter.hasNext()){
 			
