@@ -51,11 +51,11 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		System.out.print("Computed "+centroids.size()+ " clusters \n");	
 		Iterator<Vector> iter =centroids.iterator();
 		while(iter.hasNext()){
-			/**
+			
 			Centroid cent = (Centroid) iter.next();
 			System.out.print(cent.getWeight());
 			System.out.print("\n");
-			**/
+			
 		}
 	}
 }
