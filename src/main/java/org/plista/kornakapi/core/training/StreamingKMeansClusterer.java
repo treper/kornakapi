@@ -35,7 +35,9 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 	@Override
 	protected void doTrain(File targetFile, DataModel inmemoryData,
 			int numProcessors) throws IOException {
-		
+		/**
+		 * class to calculate clusters
+		 */
 		int clusters = conf.getDesiredNumCluster();
 		long cutoff = conf.getDistanceCutoff();
 
