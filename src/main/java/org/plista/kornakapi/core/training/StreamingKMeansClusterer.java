@@ -50,11 +50,22 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		UpdatableSearcher centroids = clusterer.cluster(data);		
 		System.out.print("Computed "+centroids.size()+ " clusters \n");	
 		Iterator<Vector> iter =centroids.iterator();
+		double maxWeight = 0;
+		while(iter.hasNext()){
+			Centroid cent = (Centroid) iter.next();
+			double weight =cent.getWeight();
+			if(weight > maxWeight){
+				maxWeight = weight;
+			}
+		}
+		iter =centroids.iterator();
 		while(iter.hasNext()){
 			
 			Centroid cent = (Centroid) iter.next();
-			System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + cent.getNumNonZeroElements()/cent.getWeight());
-			System.out.print("\n");
+			if(cent.getWeight()>1){
+				System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)/ cent.getNumNonZeroElements());
+				System.out.print("\n");
+			}
 			
 		}
 	}
