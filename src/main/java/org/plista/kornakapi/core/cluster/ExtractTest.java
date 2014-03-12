@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.plista.kornakapi.core.config.Configuration;
-import org.plista.kornakapi.core.storage.CandidateCacheStorageDecorator;
-import org.plista.kornakapi.core.storage.MySqlStorage;
-import org.plista.kornakapi.core.storage.Storage;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
@@ -19,6 +16,7 @@ public class ExtractTest {
 		System.out.print(path);
 		
 		File configFile = new File(path);
+		System.out.print(configFile.canRead());
 		Configuration conf = null;
 		try {
 			conf = Configuration.fromXML(Files.toString(configFile, Charsets.UTF_8));
