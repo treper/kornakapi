@@ -30,17 +30,22 @@ public class Configuration {
   
   /** if true, preference values can only be overwritten by bigger values*/
   private boolean maxPersistence;
+  
+  /** linear rating decay*/
+  private float ratingDecay;
 
   private StorageConfiguration storageConfiguration;
 
   private List<ItembasedRecommenderConfig> itembasedRecommenders = Lists.newArrayList();
   private List<FactorizationbasedRecommenderConfig> factorizationbasedRecommenders = Lists.newArrayList();
+  private List<StreamingKMeansClustererConfig> streamingKMeansClusterers = Lists.newArrayList();
 
   public static Configuration fromXML(String xml) {
     XStream serializer = new XStream();
     serializer.alias("configuration", Configuration.class);
     serializer.alias("itembasedRecommender", ItembasedRecommenderConfig.class);
     serializer.alias("factorizationbasedRecommender", FactorizationbasedRecommenderConfig.class);
+    serializer.alias("streamingKMeansClusterer", StreamingKMeansClustererConfig.class);
 
     return (Configuration) serializer.fromXML(xml);
   }
@@ -59,6 +64,14 @@ public class Configuration {
 
   public List<FactorizationbasedRecommenderConfig> getFactorizationbasedRecommenders() {
     return factorizationbasedRecommenders;
+  }
+  
+  public List<StreamingKMeansClustererConfig> getStreamingKMeansClusterer() {
+	    return streamingKMeansClusterers;
+	  }
+  
+  public void addStreamingKMeansClusterer(StreamingKMeansClustererConfig StreamingKMeansClusterer){
+	  streamingKMeansClusterers.add(StreamingKMeansClusterer);
   }
 
   public void addFactorizationbasedRecommender(FactorizationbasedRecommenderConfig factorizationbasedRecommender) {
@@ -87,5 +100,8 @@ public class Configuration {
   
   public boolean getMaxPersistence(){
 	  return maxPersistence;
+  }
+  public float getRatingDecay(){
+	  return ratingDecay;
   }
 }

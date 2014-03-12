@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.google.common.io.Closeables;
 import com.google.common.io.Files;
 
+import org.apache.commons.math3.ml.distance.ManhattanDistance;
 import org.apache.mahout.cf.taste.impl.common.FastByIDMap;
 import org.apache.mahout.cf.taste.impl.recommender.AllSimilarItemsCandidateItemsStrategy;
 import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
@@ -30,13 +31,18 @@ import org.apache.mahout.cf.taste.impl.similarity.file.FileItemSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
+import org.apache.mahout.common.IOUtils;
+import org.apache.mahout.common.distance.DistanceMeasure;
+import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.plista.kornakapi.KornakapiRecommender;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClusterer;
 import org.plista.kornakapi.core.config.RecommenderConfig;
 import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
 import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
+import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
 import org.plista.kornakapi.core.recommender.ItemSimilarityBasedRecommender;
 import org.plista.kornakapi.core.storage.CandidateCacheStorageDecorator;
 import org.plista.kornakapi.core.storage.MySqlMaxPersistentStorage;
@@ -57,7 +63,9 @@ import javax.servlet.ServletContextListener;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Map;
+import java.sql.Connection;
 
 /** servlet context listener to initialize/shut down the application */
 public class BigBangServletContextListener implements ServletContextListener {
@@ -65,6 +73,8 @@ public class BigBangServletContextListener implements ServletContextListener {
   private static final String CONFIG_PROPERTY = "kornakapi.conf";
 
   private static final Logger log = LoggerFactory.getLogger(BigBangServletContextListener.class);
+  
+
 
   @Override
   public void contextInitialized(ServletContextEvent event) {
@@ -81,12 +91,15 @@ public class BigBangServletContextListener implements ServletContextListener {
 
       Preconditions.checkState(conf.getNumProcessorsForTraining() > 0, "need at least one processor for training!");
       
+      float ratingDecay = conf.getRatingDecay();
+      
       Storage storage;
       if(conf.getMaxPersistence()){
-    	  storage = new CandidateCacheStorageDecorator(new MySqlMaxPersistentStorage(conf.getStorageConfiguration()));
+    	  storage = new CandidateCacheStorageDecorator(new MySqlMaxPersistentStorage(conf.getStorageConfiguration(), ratingDecay));
       }else{
     	  storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
       }
+      
 
 	DataModel persistentData = storage.recommenderData();
 
@@ -134,6 +147,32 @@ public class BigBangServletContextListener implements ServletContextListener {
         log.info("Created ItemBasedRecommender [{}] using similarity [{}] and [{}] similar items per item",
             new Object[] { name, itembasedConf.getSimilarityClass(), itembasedConf.getSimilarItemsPerItem() });
       }
+      
+      
+      
+      
+      
+      
+      
+      
+ /**     
+      for (StreamingKMeansClustererConfig streamingKMeansClusterer : conf.getStreamingKMeansClusterer()) {
+      
+          StreamingKMeansClusterer clusterer= new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClusterer);
+          
+**/
+   
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
       for (FactorizationbasedRecommenderConfig factorizationbasedConf : conf.getFactorizationbasedRecommenders()) {
 
