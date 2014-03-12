@@ -64,7 +64,7 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 			
 			Centroid cent = (Centroid) iter.next();
 			if(cent.getWeight()>1){
-				System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)/ cent.getNumNonZeroElements());
+				System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements());
 				System.out.print("\n");
 			}
 			
