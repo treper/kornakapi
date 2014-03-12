@@ -1,4 +1,4 @@
-package org.plista.kornakapi.core.cluster;
+package org.plista.kornakapi.core.training;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +26,9 @@ public class ExtractTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
 		StreamingKMeansClusterer clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next());
 		try {
-			clusterer.doTrain();
+			clusterer.doTrain(configFile, null, 0);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

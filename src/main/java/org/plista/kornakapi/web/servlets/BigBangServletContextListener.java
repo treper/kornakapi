@@ -35,7 +35,6 @@ import org.apache.mahout.common.IOUtils;
 import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.plista.kornakapi.KornakapiRecommender;
-import org.plista.kornakapi.core.cluster.StreamingKMeansClusterer;
 import org.plista.kornakapi.core.config.RecommenderConfig;
 import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
 import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
@@ -50,6 +49,7 @@ import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
+import org.plista.kornakapi.core.training.StreamingKMeansClusterer;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.plista.kornakapi.core.training.preferencechanges.DelegatingPreferenceChangeListener;
@@ -146,34 +146,33 @@ public class BigBangServletContextListener implements ServletContextListener {
 
         log.info("Created ItemBasedRecommender [{}] using similarity [{}] and [{}] similar items per item",
             new Object[] { name, itembasedConf.getSimilarityClass(), itembasedConf.getSimilarItemsPerItem() });
-      }
+      }     
+     
+      for (StreamingKMeansClustererConfig streamingKMeansClustererConf : conf.getStreamingKMeansClusterer()) {
       
-      
-      
-      
-      
-      
-      
-      
- /**     
-      for (StreamingKMeansClustererConfig streamingKMeansClusterer : conf.getStreamingKMeansClusterer()) {
-      
-          StreamingKMeansClusterer clusterer= new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClusterer);
-          
-**/
-   
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+    	  String name = streamingKMeansClustererConf.getName();
+    	  
+          File modelFile = new File(conf.getModelDirectory(), name + ".model");
 
+          PersistenceStrategy persistence = new FilePersistenceStrategy(modelFile);
+
+          if (!modelFile.exists()) {
+            createEmptyFactorization(persistence);
+          }
+          
+          trainers.put(name, new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClustererConf));
+          
+          String cronExpression = streamingKMeansClustererConf.getRetrainCronExpression();
+          if (cronExpression == null) {
+            scheduler.addRecommenderTrainingJob(name);
+          } else {
+            scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
+          }
+          
+          log.info("Created StreamingKMeansClusterer [{}] with [{}] minclusters and [{}] cutoff distance",
+              new Object[] { name, streamingKMeansClustererConf.getDesiredNumCluster(), streamingKMeansClustererConf.getDistanceCutoff()}); 
+      }
+   
       for (FactorizationbasedRecommenderConfig factorizationbasedConf : conf.getFactorizationbasedRecommenders()) {
 
         String name = factorizationbasedConf.getName();

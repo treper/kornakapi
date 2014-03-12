@@ -1,22 +1,25 @@
 
-package org.plista.kornakapi.core.cluster;
+package org.plista.kornakapi.core.training;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.clustering.streaming.cluster.StreamingKMeans;
 import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
+import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
-import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StreamingKMeansClusterer{
+public class StreamingKMeansClusterer extends AbstractTrainer{
 
 	private  StorageConfiguration storageConfiguration = null;
 	private StreamingKMeansClustererConfig conf = null;
@@ -24,12 +27,14 @@ public class StreamingKMeansClusterer{
 	
 
 	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf) {
+		super(conf);
 		this.storageConfiguration = storageConfiguration;
 		this.conf = conf;
 	}
 
-
-	public void doTrain() throws Exception {
+	@Override
+	protected void doTrain(File targetFile, DataModel inmemoryData,
+			int numProcessors) throws IOException {
 		
 		int clusters = conf.getDesiredNumCluster();
 		long cutoff = conf.getDistanceCutoff();
@@ -45,8 +50,6 @@ public class StreamingKMeansClusterer{
 		while(iter.hasNext()){
 			System.out.print(iter.next().size());
 		}
-
 	}
-
-
 }
+
