@@ -104,6 +104,9 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 			int howMany, IDRescorer rescorer) throws TasteException {
 
 		List<RecommendedItem> result = Lists.newArrayListWithCapacity(itemIDs.length);
+		if(centroids == null){
+			throw new TasteException("No centroids computed");
+		}
 		for(long itemId : itemIDs){
 			WeightedThing<Vector> centroid= centroids.searchFirst(extractor.getVector(itemId), true);
 			GenericRecommendedItem item = new GenericRecommendedItem(itemId, (float) centroid.getWeight());
