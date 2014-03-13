@@ -16,6 +16,7 @@ import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
 import org.slf4j.Logger;
@@ -26,15 +27,17 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 	private  StorageConfiguration storageConfiguration = null;
 	private StreamingKMeansClustererConfig conf = null;
 	private static final Logger log = LoggerFactory.getLogger(FactorizationbasedInMemoryTrainer.class);
-	private UpdatableSearcher centroids = null;
+
 	private MySqlDataExtractor extractor;
+	private StreamingKMeansClassifierModel model;
 	
 
-	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor) throws IOException {
+	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
 		this.storageConfiguration = storageConfiguration;
 		this.conf = conf;
 		this.extractor = extractor;
+		this.model = model;
 		this.doTrain(null, null, 0);
 	}
 
@@ -46,36 +49,14 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		 */
 		int clusters = conf.getDesiredNumCluster();
 		long cutoff = conf.getDistanceCutoff();
-
+		UpdatableSearcher centroids = null;
 		UpdatableSearcher searcher = new FastProjectionSearch(new ManhattanDistanceMeasure(), 10, 10);
 		StreamingKMeans clusterer = new StreamingKMeans(searcher, clusters,cutoff);
 		Matrix data = extractor.getData();
 		centroids = clusterer.cluster(data);		
-		System.out.print("Computed "+centroids.size()+ " clusters \n");	
-		Iterator<Vector> iter =centroids.iterator();
-		double maxWeight = 0;
-		while(iter.hasNext()){
-			Centroid cent = (Centroid) iter.next();
-			double weight =cent.getWeight();
-			if(weight > maxWeight){
-				maxWeight = weight;
-			}
-		}
-		System.out.print(maxWeight + "\n");
-		iter =centroids.iterator();
-		while(iter.hasNext()){
-			
-			Centroid cent = (Centroid) iter.next();
-			if(cent.getWeight()>1){
-				System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements());
-				System.out.print("\n");
-			}
-			
-		}		
+		this.model.updateCentroids(centroids);
 		
 	}
-	public UpdatableSearcher getCentroids(){
-		return this.centroids;
-	}
+
 }
 

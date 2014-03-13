@@ -17,6 +17,7 @@ import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,36 +25,16 @@ import com.google.common.collect.Lists;
 
 public class StreamingKMeansClassifierRecommender implements KornakapiRecommender{
 	
-	private UpdatableSearcher centroids;
-	private MySqlDataExtractor extractor;
-	private long meanVolume = 0;
-	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierRecommender.class);
-	
-	public StreamingKMeansClassifierRecommender(UpdatableSearcher centroids,MySqlDataExtractor extractor ){
-		this.centroids = centroids;
-		this.extractor = extractor;
-	}
-	
-	public void init(){
-		Iterator<Vector> iter =centroids.iterator();
-		double maxWeight = 0;
 
-		while(iter.hasNext()){
-			Centroid cent = (Centroid) iter.next();
-			double weight =cent.getWeight();
-			if(weight > maxWeight){
-				maxWeight = weight;
-			}
-		}
-		iter =centroids.iterator();
-		int i = 0;
-		while(iter.hasNext()){
-			Centroid cent = (Centroid)iter.next();
-			meanVolume += cent.getWeight()/maxWeight* cent.getNumNonZeroElements();
-			i++;
-		}
-		meanVolume = meanVolume/i;
+	private MySqlDataExtractor extractor;
+	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierRecommender.class);
+	private StreamingKMeansClassifierModel model; 
+	
+	public StreamingKMeansClassifierRecommender(MySqlDataExtractor extractor, StreamingKMeansClassifierModel model ){
+		this.extractor = extractor;
+		this.model = model;
 	}
+	
 
 	@Override
 	public List<RecommendedItem> recommend(long userID, int howMany)
@@ -108,22 +89,21 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 			int howMany, IDRescorer rescorer) throws TasteException {
 
 		List<RecommendedItem> result = Lists.newArrayListWithCapacity(itemIDs.length);
-		if(centroids == null){
+		if(model.getCentroids() == null){
 			throw new TasteException("No centroids computed");
 		}
 		for(long itemId : itemIDs){
 			WeightedThing<Vector> centroid;
 			try {
-				centroid = centroids.searchFirst(extractor.getVector(itemId), true);
-				GenericRecommendedItem item = new GenericRecommendedItem(itemId, (float) centroid.getWeight());
+				centroid = model.getCentroids().searchFirst(extractor.getVector(itemId), true);
+				GenericRecommendedItem item = new GenericRecommendedItem(itemId, (float) centroid.getWeight()/(float)this.model.getMeanVolume());
 				result.add(item);
 			} catch (IOException e) {
 			    if (log.isInfoEnabled()) {
 			    	log.info("{}",  e.getMessage()); 			    			
 			    }
 			}
-		}
-		
+		}		
 		return result;
 	}
 	
