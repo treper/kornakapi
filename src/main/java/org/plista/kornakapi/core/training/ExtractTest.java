@@ -28,7 +28,13 @@ public class ExtractTest {
 			e.printStackTrace();
 		}
 		MySqlDataExtractor extractor = new MySqlDataExtractor(conf.getStorageConfiguration());
-		StreamingKMeansClusterer clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next(),extractor);
+		StreamingKMeansClusterer clusterer = null;
+		try {
+			clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next(),extractor);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		try {
 			clusterer.doTrain(configFile, null, 0);
 		} catch (Exception e) {

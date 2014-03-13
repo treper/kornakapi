@@ -30,11 +30,12 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 	private MySqlDataExtractor extractor;
 	
 
-	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor) {
+	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor) throws IOException {
 		super(conf);
 		this.storageConfiguration = storageConfiguration;
 		this.conf = conf;
 		this.extractor = extractor;
+		this.doTrain(null, null, 0);
 	}
 
 	@Override
