@@ -80,8 +80,10 @@ public class StreamingKMeansClassifierModel {
 	 */
 	public RandomAccessSparseVector getVector(long itemId) throws IOException{
 		if(itemID2Vector.containsKey(itemId)){
+			System.out.print("Get item from chache");
 			return this.itemID2Vector.get(itemId);
 		}else{
+			System.out.print("Create new Item");
 			RandomAccessSparseVector itemVector = createVector(itemId);
 			setVector(itemId, itemVector);
 			return itemVector;
