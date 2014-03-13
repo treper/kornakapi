@@ -35,9 +35,11 @@ import org.apache.mahout.common.IOUtils;
 import org.apache.mahout.common.distance.DistanceMeasure;
 import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.plista.kornakapi.KornakapiRecommender;
+import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
 import org.plista.kornakapi.core.config.RecommenderConfig;
 import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
 import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
+import org.plista.kornakapi.core.recommender.StreamingKMeansClassifierRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
@@ -159,8 +161,13 @@ public class BigBangServletContextListener implements ServletContextListener {
           if (!modelFile.exists()) {
             createEmptyFactorization(persistence);
           }
+          MySqlDataExtractor extractor = new MySqlDataExtractor(conf.getStorageConfiguration());
+          StreamingKMeansClusterer clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClustererConf,extractor);
           
-          trainers.put(name, new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClustererConf));
+          trainers.put(name,clusterer);
+          
+          StreamingKMeansClassifierRecommender recommender = new StreamingKMeansClassifierRecommender(clusterer.getCentroids(), extractor);
+          recommenders.put(name, recommender);
           
           String cronExpression = streamingKMeansClustererConf.getRetrainCronExpression();
           if (cronExpression == null) {

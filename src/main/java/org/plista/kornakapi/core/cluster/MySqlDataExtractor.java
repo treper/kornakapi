@@ -35,27 +35,34 @@ public class MySqlDataExtractor extends MySqlStorage{
 	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 20 && nums <30";
 	private static final String test = "SELECT * FROM taste_preferences";
 	private static String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
+	private int dim;
+	private FastIDSet allItems;
+	private HashMap<Long, FastIDSet> userItemIds;
+	private FastIDSet userids;
+	
 
 	
 	
 	
 	 public MySqlDataExtractor(StorageConfiguration storageConf){
 			super(storageConf);
+			this.init();
 	  }
-	
-	 public Matrix getData(){
-		 	FastIDSet userids = this.getQuery(GET_USER);
-		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
-		 	FastIDSet allItems = new FastIDSet();
-		 	int dim = userids.size();
-		 	
+	 
+	 public void init(){
+		 	this.userids = this.getQuery(GET_USER);
+		 	this.userItemIds = new HashMap<Long, FastIDSet>();
+		 	this.allItems = new FastIDSet();
+		 	this.dim = userids.size();
 		 	for(long userid : userids.toArray()){
 		 		String getUserItems = this.GET_USER_ITEMS_BASE + String.valueOf(userid);
 		 		FastIDSet userItems = getQuery(getUserItems);
 		 		allItems.addAll(userItems);
 		 		userItemIds.put(userid, userItems);
 		 	}
-		 	
+	 }
+	
+	 public Matrix getData(){		 	
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
@@ -73,9 +80,6 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		n++;	 		
 		 	}
 		 return new SparseMatrix(n,dim,vectors);
-
-		 	
-
 	 }
 	 
 	public FastIDSet getQuery(String query){
@@ -103,6 +107,25 @@ public class MySqlDataExtractor extends MySqlStorage{
 		      IOUtils.quietClose(conn);
 		}
 		return candidates;
+	}
+	
+	/**
+	 * Returns the RandomAccessSparseVector of an item id
+	 * @param itemId
+	 * @return RandomAccessSparseVector
+	 */
+	public Vector getVector(long itemId){
+		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, dim);
+		int i = 0;
+ 		for(long userid : userids.toArray()){
+ 			
+ 			FastIDSet itemIds = userItemIds.get(userid);
+ 			if(itemIds.contains(itemId)){
+ 				itemVector.set(i, 1);
+ 			}
+ 			i++;
+ 		}		
+		return itemVector;
 	}
 
 

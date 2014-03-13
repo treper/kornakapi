@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.apache.mahout.cf.taste.impl.recommender.svd.FilePersistenceStrategy;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.clustering.streaming.cluster.StreamingKMeans;
 import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
@@ -25,12 +26,15 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 	private  StorageConfiguration storageConfiguration = null;
 	private StreamingKMeansClustererConfig conf = null;
 	private static final Logger log = LoggerFactory.getLogger(FactorizationbasedInMemoryTrainer.class);
+	private UpdatableSearcher centroids = null;
+	private MySqlDataExtractor extractor;
 	
 
-	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf) {
+	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor) {
 		super(conf);
 		this.storageConfiguration = storageConfiguration;
 		this.conf = conf;
+		this.extractor = extractor;
 	}
 
 	@Override
@@ -44,10 +48,8 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 
 		UpdatableSearcher searcher = new FastProjectionSearch(new ManhattanDistanceMeasure(), 10, 10);
 		StreamingKMeans clusterer = new StreamingKMeans(searcher, clusters,cutoff);
-		MySqlDataExtractor extractor = new MySqlDataExtractor(storageConfiguration);
 		Matrix data = extractor.getData();
-		extractor.close();
-		UpdatableSearcher centroids = clusterer.cluster(data);		
+		centroids = clusterer.cluster(data);		
 		System.out.print("Computed "+centroids.size()+ " clusters \n");	
 		Iterator<Vector> iter =centroids.iterator();
 		double maxWeight = 0;
@@ -68,7 +70,11 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 				System.out.print("\n");
 			}
 			
-		}
+		}		
+		
+	}
+	public UpdatableSearcher getCentroids(){
+		return this.centroids;
 	}
 }
 
