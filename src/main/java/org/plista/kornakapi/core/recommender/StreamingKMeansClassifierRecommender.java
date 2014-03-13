@@ -98,7 +98,7 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 				
 				
 		        long start = System.currentTimeMillis();				
-				centroid = model.getCentroids().searchFirst(extractor.getVector(itemId), true);
+				centroid = model.getCentroids().searchFirst(model.getVector(itemId), true);
 		        long duration = System.currentTimeMillis() - start;
 			    if (log.isInfoEnabled()) {
 			    	log.info("Fetched clossest centroid in {}" + duration + "ms\n"); 			    			

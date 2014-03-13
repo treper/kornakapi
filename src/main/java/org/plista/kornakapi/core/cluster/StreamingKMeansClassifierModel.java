@@ -17,7 +17,7 @@ public class StreamingKMeansClassifierModel {
 	
 	private double maxWeight = 0;
 	private double meanVolume=0;
-	private HashMap<Integer, RandomAccessSparseVector> itemID2Vector = new HashMap<Integer, RandomAccessSparseVector>();
+	private HashMap<Long, RandomAccessSparseVector> itemID2Vector = new HashMap<Long, RandomAccessSparseVector>();
 	private FastIDSet allItems = null;
 	private HashMap<Long, FastIDSet> userItemIds = null;
 	private FastIDSet userids = null;
@@ -68,22 +68,22 @@ public class StreamingKMeansClassifierModel {
 		return this.meanVolume;
 	}
 	
-	public void setVector(int itemID, RandomAccessSparseVector itemVector){
+	public void setVector(long itemID, RandomAccessSparseVector itemVector){
 		itemID2Vector.put(itemID, itemVector);
 	}
 	
 	/**
 	 * checks if vector of itemID is allready computed in hashmap, computes it if not and returns it
-	 * @param itemID
+	 * @param itemId
 	 * @return
 	 * @throws IOException
 	 */
-	public RandomAccessSparseVector getVector(int itemID) throws IOException{
-		if(itemID2Vector.containsKey(itemID)){
-			return this.itemID2Vector.get(itemID);
+	public RandomAccessSparseVector getVector(long itemId) throws IOException{
+		if(itemID2Vector.containsKey(itemId)){
+			return this.itemID2Vector.get(itemId);
 		}else{
-			RandomAccessSparseVector itemVector = createVector(itemID);
-			setVector(itemID, itemVector);
+			RandomAccessSparseVector itemVector = createVector(itemId);
+			setVector(itemId, itemVector);
 			return itemVector;
 		}
 		
