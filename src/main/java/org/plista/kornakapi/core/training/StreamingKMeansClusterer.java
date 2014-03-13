@@ -29,14 +29,13 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 	private StreamingKMeansClustererConfig conf = null;
 	private static final Logger log = LoggerFactory.getLogger(FactorizationbasedInMemoryTrainer.class);
 
-	private MySqlDataExtractor extractor;
+	private StorageConfiguration storage;
 	private StreamingKMeansClassifierModel model;
 	
 
-	public StreamingKMeansClusterer(StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor, StreamingKMeansClassifierModel model) throws IOException {
+	public StreamingKMeansClusterer(StorageConfiguration storage,StreamingKMeansClustererConfig conf, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
-		this.conf = conf;
-		this.extractor = extractor;
+		this.storage = storage;
 		this.model = model;
 	}
 
@@ -46,6 +45,7 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		/**
 		 * class to calculate clusters
 		 */
+		MySqlDataExtractor extractor = new MySqlDataExtractor(storage);
 		int clusters = conf.getDesiredNumCluster();
 		long cutoff = conf.getDistanceCutoff();
 		UpdatableSearcher centroids = null;
