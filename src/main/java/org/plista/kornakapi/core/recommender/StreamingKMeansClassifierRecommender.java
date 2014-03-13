@@ -99,13 +99,10 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 	}
 
 	@Override
-	public List<RecommendedItem> recommendToAnonymous(long[] itemIDs,
+
+	public List<RecommendedItem>  recommendToAnonymous(long[] itemIDs,
 			int howMany, IDRescorer rescorer) throws TasteException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	public List<RecommendedItem>  recommendToAnonymous(long[] itemIDs) throws TasteException {
+
 		List<RecommendedItem> result = Lists.newArrayListWithCapacity(itemIDs.length);
 		for(long itemId : itemIDs){
 			WeightedThing<Vector> centroid= centroids.searchFirst(extractor.getVector(itemId), true);
