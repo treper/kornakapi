@@ -10,7 +10,10 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
+import org.plista.kornakapi.core.recommender.StreamingKMeansClassifierRecommender;
 import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamingKMeansClassifierModel {
 
@@ -21,6 +24,7 @@ public class StreamingKMeansClassifierModel {
 	private FastIDSet userids = null;
 	private int dim=0;
 	private HashMap<Long, WeightedThing<Vector>> itemID2Centroid = new HashMap<Long, WeightedThing<Vector>>();
+	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierModel.class);
 	
 /**
  * Method that updates the model if new centroids are callculated
@@ -32,7 +36,9 @@ public class StreamingKMeansClassifierModel {
 		this.userids = data.getUserIDs();
 		this.dim = data.getDim();		
 		this.centroids = centroids;
-		System.out.print("Computed "+centroids.size()+ " clusters \n");	
+		if (log.isInfoEnabled()) {
+			log.info("Computed "+centroids.size()+ " clusters \n");
+		}
 		Iterator<Vector> iter =centroids.iterator();
 		while(iter.hasNext()){
 			Centroid cent = (Centroid) iter.next();
@@ -41,15 +47,16 @@ public class StreamingKMeansClassifierModel {
 				maxWeight = weight;
 			}
 		}
-		System.out.print("maxWeight= " +maxWeight + "\n");
 		iter =centroids.iterator();
 		int i = 0;
 		while(iter.hasNext()){		
 			Centroid cent = (Centroid) iter.next();
 			meanVolume += cent.getWeight()/maxWeight* cent.getNumNonZeroElements();
 			i++;
-			System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements());
-			System.out.print("\n");	
+		    if (log.isInfoEnabled()) {
+		    	log.info("Weight= [{}], l2norm= [{}], num non zero elems= [{}] Volume= [{}]",
+		    			new Object[] {cent.getWeight(), cent.norm(2),cent.getNumNonZeroElements() , (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements() }); 			    			
+		    }
 		}
 		meanVolume = meanVolume/i;
 		this.itemID2Centroid.clear();
