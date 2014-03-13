@@ -39,7 +39,6 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		this.conf = conf;
 		this.extractor = extractor;
 		this.model = model;
-		this.doTrain(null, null, 0);
 	}
 
 	@Override
