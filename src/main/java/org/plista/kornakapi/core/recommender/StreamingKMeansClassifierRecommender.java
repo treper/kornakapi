@@ -96,7 +96,6 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 			WeightedThing<Vector> centroid;
 			try {	
 				centroid = model.getCentroids().searchFirst(extractor.getVector(itemId), true);
-				System.out.print("MaxWeight" + model.getMaxWeight() + "meanVolume" + model.getMeanVolume()+ "Centroid weight"+ centroid.getWeight());
 				float volume = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
 				/**
 				 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector
