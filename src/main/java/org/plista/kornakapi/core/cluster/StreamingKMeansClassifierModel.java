@@ -1,8 +1,10 @@
 package org.plista.kornakapi.core.cluster;
 
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.mahout.math.Centroid;
+import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 
@@ -12,6 +14,7 @@ public class StreamingKMeansClassifierModel {
 	
 	private double maxWeight = 0;
 	private double meanVolume=0;
+	private HashMap<Integer, RandomAccessSparseVector> itemID2Vector = new HashMap<Integer, RandomAccessSparseVector>();
 	
 	public void updateCentroids (UpdatableSearcher centroids){
 		this.centroids = centroids;
@@ -35,6 +38,7 @@ public class StreamingKMeansClassifierModel {
 			System.out.print("\n");	
 		}
 		meanVolume = meanVolume/i;
+		this.itemID2Vector.clear();
 	}
 	public UpdatableSearcher getCentroids(){
 		return this.centroids;
@@ -46,5 +50,12 @@ public class StreamingKMeansClassifierModel {
 	
 	public double getMeanVolume(){
 		return this.meanVolume;
+	}
+	
+	public void setVector(int itemID, RandomAccessSparseVector itemVector){
+		itemID2Vector.put(itemID, itemVector);
+	}
+	public RandomAccessSparseVector getVector(int itemID){
+		return this.itemID2Vector.get(itemID);
 	}
 }
