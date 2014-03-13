@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.Configuration;
 
 import com.google.common.base.Charsets;
@@ -29,8 +30,9 @@ public class ExtractTest {
 		}
 		MySqlDataExtractor extractor = new MySqlDataExtractor(conf.getStorageConfiguration());
 		StreamingKMeansClusterer clusterer = null;
+		StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel();
 		try {
-			clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next(),extractor);
+			clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next(),extractor, model);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
