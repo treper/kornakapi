@@ -113,19 +113,27 @@ public class MySqlDataExtractor extends MySqlStorage{
 	 * Returns the RandomAccessSparseVector of an item id
 	 * @param itemId
 	 * @return RandomAccessSparseVector
+	 * @throws IOException 
 	 */
-	public Vector getVector(long itemId){
+	public Vector getVector(long itemId) throws IOException{
 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, dim);
 		int i = 0;
+		boolean isRated = false;
  		for(long userid : userids.toArray()){
  			
  			FastIDSet itemIds = userItemIds.get(userid);
  			if(itemIds.contains(itemId)){
  				itemVector.set(i, 1);
+ 				isRated = true;
  			}
  			i++;
- 		}		
-		return itemVector;
+ 		}	
+ 		if(isRated){
+ 			return itemVector;
+ 		}else{
+ 			throw new IOException("Item unknown");
+ 		}
+		
 	}
 
 
