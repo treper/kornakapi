@@ -9,6 +9,7 @@ import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
+import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.core.cluster.MySqlDataExtractor.StreamingKMeansDataObject;
 
 public class StreamingKMeansClassifierModel {
@@ -17,11 +18,11 @@ public class StreamingKMeansClassifierModel {
 	
 	private double maxWeight = 0;
 	private double meanVolume=0;
-	private HashMap<Long, RandomAccessSparseVector> itemID2Vector = new HashMap<Long, RandomAccessSparseVector>();
 	private FastIDSet allItems = null;
 	private HashMap<Long, FastIDSet> userItemIds = null;
 	private FastIDSet userids = null;
 	private int dim=0;
+	private HashMap<Long, WeightedThing<Vector>> itemID2Centroid = new HashMap<Long, WeightedThing<Vector>>();
 	
 /**
  * Method that updates the model if new centroids are callculated
@@ -54,7 +55,7 @@ public class StreamingKMeansClassifierModel {
 			System.out.print("\n");	
 		}
 		meanVolume = meanVolume/i;
-		this.itemID2Vector.clear();
+		this.itemID2Centroid.clear();
 	}
 	public UpdatableSearcher getCentroids(){
 		return this.centroids;
@@ -68,29 +69,18 @@ public class StreamingKMeansClassifierModel {
 		return this.meanVolume;
 	}
 	
-	public void setVector(long itemID, RandomAccessSparseVector itemVector){
-		itemID2Vector.put(itemID, itemVector);
-	}
-	
-	/**
-	 * checks if vector of itemID is allready computed in hashmap, computes it if not and returns it
-	 * @param itemId
-	 * @return
-	 * @throws IOException
-	 */
-	public RandomAccessSparseVector getVector(long itemId) throws IOException{
-		if(itemID2Vector.containsKey(itemId)){
-			System.out.print("Get item from chache");
-			return this.itemID2Vector.get(itemId);
-		}else{
-			System.out.print("Create new Item");
-			RandomAccessSparseVector itemVector = createVector(itemId);
-			setVector(itemId, itemVector);
-			return itemVector;
-		}
-		
-	}
 
+	
+/**
+ * 
+ * @param itemId
+ * @return
+ * @throws IOException
+ */
+	public RandomAccessSparseVector getVector(long itemId) throws IOException{
+			return  createVector(itemId);
+	}
+		
 	/**
 	 * Returns the RandomAccessSparseVector of an item id
 	 * @param itemId
@@ -116,4 +106,13 @@ public class StreamingKMeansClassifierModel {
  		}
 	}
 	
+	public WeightedThing<Vector> getClossestCentroid(long itemID) throws IOException{
+		if(itemID2Centroid.containsKey(itemID)){
+			return itemID2Centroid.get(itemID);
+		}else{
+			WeightedThing<Vector> cent = centroids.searchFirst(getVector(itemID), true);
+			itemID2Centroid.put(itemID, cent);
+			return cent;
+		}	
+	}	
 }

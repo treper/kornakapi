@@ -85,7 +85,6 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 	}
 
 	@Override
-
 	public List<RecommendedItem>  recommendToAnonymous(long[] itemIDs,
 			int howMany, IDRescorer rescorer) throws TasteException {
 
@@ -93,13 +92,11 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 		if(model.getCentroids() == null){
 			throw new TasteException("No centroids computed");
 		}
-		for(long itemId : itemIDs){
+		for(long itemID : itemIDs){
 			WeightedThing<Vector> centroid;
 			try {	
-				
-				RandomAccessSparseVector vector = model.getVector(itemId);
 		        long start = System.currentTimeMillis();				
-				centroid = model.getCentroids().searchFirst(vector, true);
+				centroid = model.getClossestCentroid(itemID);
 		        long duration = System.currentTimeMillis() - start;
 			    if (log.isInfoEnabled()) {
 			    	log.info("Fetched clossest centroid in {}" + duration + "ms\n"); 			    			
@@ -109,7 +106,7 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 				 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector
 				 * then volume should be normalized by ((Vector)centroid).getNumNonZeroElements
 				 */
-				GenericRecommendedItem item = new GenericRecommendedItem(itemId,  volume/(float)this.model.getMeanVolume());
+				GenericRecommendedItem item = new GenericRecommendedItem(itemID,  volume/(float)this.model.getMeanVolume());
 				result.add(item);
 			} catch (IOException e) {
 			    if (log.isInfoEnabled()) {
