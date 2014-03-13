@@ -1,4 +1,4 @@
-package org.plista.kornakapi.core.cluster;
+package org.plista.kornakapi.core.storage;
 
 
 
@@ -21,7 +21,6 @@ import org.apache.mahout.math.SparseMatrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
 import org.plista.kornakapi.core.config.StorageConfiguration;
-import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 
@@ -35,22 +34,24 @@ public class MySqlDataExtractor extends MySqlStorage{
 	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 20 && nums <30";
 	private static final String test = "SELECT * FROM taste_preferences";
 	private static String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
-	private int dim;
 
-	
 
-	
-	
-	
+/**
+ * 	
+ * @param storageConf
+ */
 	 public MySqlDataExtractor(StorageConfiguration storageConf){
 			super(storageConf);
 	  }
-	 
+	 /**
+	  * 
+	  * @return
+	  */
 	 public StreamingKMeansDataObject getData(){	
 		 	FastIDSet userids = this.getQuery(GET_USER);
 		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
 		 	FastIDSet allItems = new FastIDSet();
-		 	this.dim = userids.size();
+		 	int dim = userids.size();
 		 	for(long userid : userids.toArray()){
 		 		String getUserItems = this.GET_USER_ITEMS_BASE + String.valueOf(userid);
 		 		FastIDSet userItems = getQuery(getUserItems);
@@ -76,7 +77,11 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	
 		 return new StreamingKMeansDataObject(userids, userItemIds, allItems, new SparseMatrix(n,dim,vectors), dim);
 	 }
-	 
+	 /**
+	  * Data object containing all variables important for the model
+	  * @author maxweule
+	  *
+	  */
 	 public class StreamingKMeansDataObject{
 		 private FastIDSet userids;
 		 private HashMap<Long, FastIDSet> userItemIds;

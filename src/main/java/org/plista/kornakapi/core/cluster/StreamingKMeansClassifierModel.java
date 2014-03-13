@@ -10,12 +10,11 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
-import org.plista.kornakapi.core.cluster.MySqlDataExtractor.StreamingKMeansDataObject;
+import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataObject;
 
 public class StreamingKMeansClassifierModel {
 
 	private UpdatableSearcher centroids = null;
-	
 	private double maxWeight = 0;
 	private double meanVolume=0;
 	private FastIDSet allItems = null;
@@ -68,9 +67,7 @@ public class StreamingKMeansClassifierModel {
 	public double getMeanVolume(){
 		return this.meanVolume;
 	}
-	
-
-	
+		
 /**
  * 
  * @param itemId

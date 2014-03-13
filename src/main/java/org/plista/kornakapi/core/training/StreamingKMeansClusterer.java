@@ -15,11 +15,11 @@ import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
-import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
-import org.plista.kornakapi.core.cluster.MySqlDataExtractor.StreamingKMeansDataObject;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
+import org.plista.kornakapi.core.storage.MySqlDataExtractor;
+import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

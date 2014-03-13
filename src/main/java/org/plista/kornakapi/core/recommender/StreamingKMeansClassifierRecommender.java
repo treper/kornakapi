@@ -17,8 +17,8 @@ import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.KornakapiRecommender;
-import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
+import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,13 +94,8 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 		}
 		for(long itemID : itemIDs){
 			WeightedThing<Vector> centroid;
-			try {	
-		        long start = System.currentTimeMillis();				
+			try {					
 				centroid = model.getClossestCentroid(itemID);
-		        long duration = System.currentTimeMillis() - start;
-			    if (log.isInfoEnabled()) {
-			    	log.info("Fetched clossest centroid in {}" + duration + "ms\n"); 			    			
-			    }
 				float volume = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
 				/**
 				 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector

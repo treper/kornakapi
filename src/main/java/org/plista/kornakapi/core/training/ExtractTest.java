@@ -3,9 +3,9 @@ package org.plista.kornakapi.core.training;
 import java.io.File;
 import java.io.IOException;
 
-import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.Configuration;
+import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
