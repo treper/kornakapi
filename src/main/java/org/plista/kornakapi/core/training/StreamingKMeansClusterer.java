@@ -35,6 +35,7 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 
 	public StreamingKMeansClusterer(StorageConfiguration storage,StreamingKMeansClustererConfig conf, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
+		this.conf = conf;
 		this.storage = storage;
 		this.model = model;
 	}
