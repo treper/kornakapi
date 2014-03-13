@@ -17,7 +17,6 @@ public class StreamingKMeansClassifierModel {
 		this.centroids = centroids;
 		System.out.print("Computed "+centroids.size()+ " clusters \n");	
 		Iterator<Vector> iter =centroids.iterator();
-		double maxWeight = 0;
 		while(iter.hasNext()){
 			Centroid cent = (Centroid) iter.next();
 			double weight =cent.getWeight();
@@ -25,17 +24,15 @@ public class StreamingKMeansClassifierModel {
 				maxWeight = weight;
 			}
 		}
-		System.out.print(maxWeight + "\n");
+		System.out.print("maxWeight= " +maxWeight + "\n");
 		iter =centroids.iterator();
 		int i = 0;
 		while(iter.hasNext()){		
 			Centroid cent = (Centroid) iter.next();
 			meanVolume += cent.getWeight()/maxWeight* cent.getNumNonZeroElements();
 			i++;
-			if(cent.getWeight()>1){
-				System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements());
-				System.out.print("\n");
-			}	
+			System.out.print("Weight= " +cent.getWeight()+ ", l2norm= " +cent.norm(2) + " num non zero elems= "+cent.getNumNonZeroElements() + " Volume= " + (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements());
+			System.out.print("\n");	
 		}
 		meanVolume = meanVolume/i;
 	}
