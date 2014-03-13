@@ -12,6 +12,7 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.math.Centroid;
+import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
@@ -96,9 +97,9 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 			WeightedThing<Vector> centroid;
 			try {	
 				
-				
+				RandomAccessSparseVector vector = model.getVector(itemId);
 		        long start = System.currentTimeMillis();				
-				centroid = model.getCentroids().searchFirst(model.getVector(itemId), true);
+				centroid = model.getCentroids().searchFirst(vector, true);
 		        long duration = System.currentTimeMillis() - start;
 			    if (log.isInfoEnabled()) {
 			    	log.info("Fetched clossest centroid in {}" + duration + "ms\n"); 			    			
