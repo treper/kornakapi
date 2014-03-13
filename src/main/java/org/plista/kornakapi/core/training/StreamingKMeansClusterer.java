@@ -16,6 +16,7 @@ import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
+import org.plista.kornakapi.core.cluster.MySqlDataExtractor.StreamingKMeansDataObject;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
@@ -52,9 +53,10 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		UpdatableSearcher centroids = null;
 		UpdatableSearcher searcher = new FastProjectionSearch(new ManhattanDistanceMeasure(), 10, 10);
 		StreamingKMeans clusterer = new StreamingKMeans(searcher, clusters,cutoff);
-		Matrix data = extractor.getData();
-		centroids = clusterer.cluster(data);		
-		this.model.updateCentroids(centroids);
+		StreamingKMeansDataObject data = extractor.getData();
+		extractor.close();
+		centroids = clusterer.cluster(data.getMatrix());		
+		this.model.updateCentroids(data, centroids);
 		
 	}
 

@@ -36,9 +36,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 	private static final String test = "SELECT * FROM taste_preferences";
 	private static String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
 	private int dim;
-	private FastIDSet allItems;
-	private HashMap<Long, FastIDSet> userItemIds;
-	private FastIDSet userids;
+
 	
 
 	
@@ -46,13 +44,12 @@ public class MySqlDataExtractor extends MySqlStorage{
 	
 	 public MySqlDataExtractor(StorageConfiguration storageConf){
 			super(storageConf);
-			this.init();
 	  }
 	 
-	 public void init(){
-		 	this.userids = this.getQuery(GET_USER);
-		 	this.userItemIds = new HashMap<Long, FastIDSet>();
-		 	this.allItems = new FastIDSet();
+	 public StreamingKMeansDataObject getData(){	
+		 	FastIDSet userids = this.getQuery(GET_USER);
+		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
+		 	FastIDSet allItems = new FastIDSet();
 		 	this.dim = userids.size();
 		 	for(long userid : userids.toArray()){
 		 		String getUserItems = this.GET_USER_ITEMS_BASE + String.valueOf(userid);
@@ -60,9 +57,6 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		allItems.addAll(userItems);
 		 		userItemIds.put(userid, userItems);
 		 	}
-	 }
-	
-	 public Matrix getData(){		 	
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
@@ -79,7 +73,44 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		vectors.put(n, itemVector);
 		 		n++;	 		
 		 	}
-		 return new SparseMatrix(n,dim,vectors);
+		 	
+		 return new StreamingKMeansDataObject(userids, userItemIds, allItems, new SparseMatrix(n,dim,vectors), dim);
+	 }
+	 
+	 public class StreamingKMeansDataObject{
+		 private FastIDSet userids;
+		 private HashMap<Long, FastIDSet> userItemIds;
+		 private FastIDSet allItems;
+		 private int dim;
+		 private SparseMatrix matrix;
+		 
+		 public StreamingKMeansDataObject(FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, FastIDSet allItems, SparseMatrix matrix, int dim){
+			 this.userids = userids;
+			 this.userItemIds = userItemIds;
+			 this.allItems = allItems;
+			 this.dim = dim;
+			 this.matrix = matrix;
+		 }
+		 
+		 public FastIDSet getUserIDs(){
+			 return this.userids;
+		 }
+		 public HashMap<Long, FastIDSet> getUserItemIDs(){
+			 return this.userItemIds;
+		 }
+		 
+		 public FastIDSet getAllItems(){
+			 return this.allItems;
+		 }
+		 
+		 public Matrix getMatrix(){
+			 return this.matrix;
+		 }
+		 
+		 public int getDim(){
+			 return this.dim;
+		 }
+		 
 	 }
 	 
 	public FastIDSet getQuery(String query){
@@ -109,32 +140,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		return candidates;
 	}
 	
-	/**
-	 * Returns the RandomAccessSparseVector of an item id
-	 * @param itemId
-	 * @return RandomAccessSparseVector
-	 * @throws IOException 
-	 */
-	public Vector getVector(long itemId) throws IOException{
-		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, dim);
-		int i = 0;
-		boolean isRated = false;
- 		for(long userid : userids.toArray()){
- 			
- 			FastIDSet itemIds = userItemIds.get(userid);
- 			if(itemIds.contains(itemId)){
- 				itemVector.set(i, 1);
- 				isRated = true;
- 			}
- 			i++;
- 		}	
- 		if(isRated){
- 			return itemVector;
- 		}else{
- 			throw new IOException("Item unknown");
- 		}
-		
-	}
+
 
 
 }
