@@ -97,9 +97,9 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 				float volume = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
 				/**
 				 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector
-				 * then volume should be normalized by ((Vector)centroid).getNumNonZeroElements
+				 * then volume should be normalized by volume*((Vector)centroid).getNumNonZeroElements/(float)this.model.getMeanVolume() or getMaxVolume
 				 */
-				GenericRecommendedItem item = new GenericRecommendedItem(itemID,  volume/(float)this.model.getMeanVolume());
+				GenericRecommendedItem item = new GenericRecommendedItem(itemID,  volume);
 				result.add(item);
 			} catch (IOException e) {
 			    if (log.isInfoEnabled()) {
