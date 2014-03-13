@@ -27,12 +27,10 @@ import com.google.common.collect.Lists;
 public class StreamingKMeansClassifierRecommender implements KornakapiRecommender{
 	
 
-	private MySqlDataExtractor extractor;
 	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierRecommender.class);
 	private StreamingKMeansClassifierModel model; 
 	
-	public StreamingKMeansClassifierRecommender(MySqlDataExtractor extractor, StreamingKMeansClassifierModel model ){
-		this.extractor = extractor;
+	public StreamingKMeansClassifierRecommender( StreamingKMeansClassifierModel model ){
 		this.model = model;
 	}
 	

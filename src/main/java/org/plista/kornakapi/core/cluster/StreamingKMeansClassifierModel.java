@@ -17,7 +17,6 @@ public class StreamingKMeansClassifierModel {
 	private UpdatableSearcher centroids = null;
 	private double maxWeight = 0;
 	private double meanVolume=0;
-	private FastIDSet allItems = null;
 	private HashMap<Long, FastIDSet> userItemIds = null;
 	private FastIDSet userids = null;
 	private int dim=0;
@@ -29,7 +28,6 @@ public class StreamingKMeansClassifierModel {
  * @param centroids
  */
 	public void updateCentroids (StreamingKMeansDataObject data, UpdatableSearcher centroids){
-		this.allItems = data.getAllItems();
 		this.userItemIds = data.getUserItemIDs();		
 		this.userids = data.getUserIDs();
 		this.dim = data.getDim();		

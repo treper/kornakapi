@@ -164,10 +164,10 @@ public class BigBangServletContextListener implements ServletContextListener {
           }
           StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel(); 
           MySqlDataExtractor extractor = new MySqlDataExtractor(conf.getStorageConfiguration());
-          StreamingKMeansClusterer clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClustererConf,extractor, model);
+          StreamingKMeansClusterer clusterer = new StreamingKMeansClusterer(streamingKMeansClustererConf,extractor, model);
           trainers.put(name,clusterer);
           
-          StreamingKMeansClassifierRecommender recommender = new StreamingKMeansClassifierRecommender( extractor, model);
+          StreamingKMeansClassifierRecommender recommender = new StreamingKMeansClassifierRecommender(model);
           recommenders.put(name, recommender);
           
           String cronExpression = streamingKMeansClustererConf.getRetrainCronExpression();

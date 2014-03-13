@@ -32,7 +32,7 @@ public class ExtractTest {
 		StreamingKMeansClusterer clusterer = null;
 		StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel();
 		try {
-			clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next(),extractor, model);
+			clusterer = new StreamingKMeansClusterer(conf.getStreamingKMeansClusterer().iterator().next(),extractor, model);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();

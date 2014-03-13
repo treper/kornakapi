@@ -75,7 +75,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		n++;	 		
 		 	}
 		 	
-		 return new StreamingKMeansDataObject(userids, userItemIds, allItems, new SparseMatrix(n,dim,vectors), dim);
+		 return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
 	 }
 	 /**
 	  * Data object containing all variables important for the model
@@ -85,14 +85,12 @@ public class MySqlDataExtractor extends MySqlStorage{
 	 public class StreamingKMeansDataObject{
 		 private FastIDSet userids;
 		 private HashMap<Long, FastIDSet> userItemIds;
-		 private FastIDSet allItems;
 		 private int dim;
 		 private SparseMatrix matrix;
 		 
-		 public StreamingKMeansDataObject(FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, FastIDSet allItems, SparseMatrix matrix, int dim){
+		 public StreamingKMeansDataObject(FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, SparseMatrix matrix, int dim){
 			 this.userids = userids;
 			 this.userItemIds = userItemIds;
-			 this.allItems = allItems;
 			 this.dim = dim;
 			 this.matrix = matrix;
 		 }
@@ -102,10 +100,6 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 }
 		 public HashMap<Long, FastIDSet> getUserItemIDs(){
 			 return this.userItemIds;
-		 }
-		 
-		 public FastIDSet getAllItems(){
-			 return this.allItems;
 		 }
 		 
 		 public Matrix getMatrix(){

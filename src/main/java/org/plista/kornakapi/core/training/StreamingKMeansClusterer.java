@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class StreamingKMeansClusterer extends AbstractTrainer{
 
-	private  StorageConfiguration storageConfiguration = null;
+
 	private StreamingKMeansClustererConfig conf = null;
 	private static final Logger log = LoggerFactory.getLogger(FactorizationbasedInMemoryTrainer.class);
 
@@ -33,9 +33,8 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 	private StreamingKMeansClassifierModel model;
 	
 
-	public StreamingKMeansClusterer(StorageConfiguration storageConfiguration, StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor, StreamingKMeansClassifierModel model) throws IOException {
+	public StreamingKMeansClusterer(StreamingKMeansClustererConfig conf, MySqlDataExtractor extractor, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
-		this.storageConfiguration = storageConfiguration;
 		this.conf = conf;
 		this.extractor = extractor;
 		this.model = model;
