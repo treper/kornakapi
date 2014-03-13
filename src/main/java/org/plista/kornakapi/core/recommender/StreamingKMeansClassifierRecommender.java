@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.apache.mahout.cf.taste.common.Refreshable;
 import org.apache.mahout.cf.taste.common.TasteException;
+import org.apache.mahout.cf.taste.impl.recommender.GenericRecommendedItem;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
@@ -15,6 +16,8 @@ import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.cluster.MySqlDataExtractor;
+
+import com.google.common.collect.Lists;
 
 public class StreamingKMeansClassifierRecommender implements KornakapiRecommender{
 	
@@ -102,16 +105,16 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 		return null;
 	}
 	
-	public double recommendToAnonymous(long[] itemIDs) throws TasteException {
-		long weight = 0;
-
+	public List<RecommendedItem>  recommendToAnonymous(long[] itemIDs) throws TasteException {
+		List<RecommendedItem> result = Lists.newArrayListWithCapacity(itemIDs.length);
 		for(long itemId : itemIDs){
 			WeightedThing<Vector> centroid= centroids.searchFirst(extractor.getVector(itemId), true);
-			weight += centroid.getWeight();
+			GenericRecommendedItem item = new GenericRecommendedItem(itemId, (float) centroid.getWeight());
+			result.add(item);
 
 		}
-		weight = (weight/itemIDs.length)/meanVolume;
-		return weight;
+		
+		return result;
 	}
 	
 
