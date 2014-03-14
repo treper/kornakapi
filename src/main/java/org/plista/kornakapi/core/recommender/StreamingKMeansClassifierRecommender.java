@@ -94,12 +94,13 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 			WeightedThing<Vector> centroid;
 			try {					
 				centroid = model.getClossestCentroid(itemID);
-				float volume = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
+				float normWeight = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
 				/**
+				 * 
 				 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector
 				 * then volume should be normalized by volume*((Vector)centroid).getNumNonZeroElements/(float)this.model.getMeanVolume() or getMaxVolume
 				 */
-				GenericRecommendedItem item = new GenericRecommendedItem(itemID,  volume);
+				GenericRecommendedItem item = new GenericRecommendedItem(itemID,  normWeight);
 				result.add(item);
 			} catch (IOException e) {
 			    if (log.isInfoEnabled()) {
@@ -109,6 +110,4 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 		}		
 		return result;
 	}
-	
-
 }
