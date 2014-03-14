@@ -20,7 +20,10 @@ import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.SparseMatrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.VectorWritable;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.StorageConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 
@@ -31,9 +34,11 @@ import com.google.common.io.Closeables;
 public class MySqlDataExtractor extends MySqlStorage{
 	
 
-	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 15 && nums <30";
+	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 20 && nums <30";
 	private static final String test = "SELECT * FROM taste_preferences";
 	private static String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
+	private static String GET_ALL_RATED_ITEMS = "SELECT DISTINCT(item_id) FROM taste_preferences";
+	private static final Logger log = LoggerFactory.getLogger(MySqlDataExtractor.class);
 
 
 
@@ -74,6 +79,14 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		}
 		 		vectors.put(n, itemVector);
 		 		n++;	 		
+		 	}
+
+
+		 	if (log.isInfoEnabled()) {
+			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
+			 	int numAllConcideredItems = allItems.size(); 
+			 	log.info("Clustering [{}] of [{}] items",
+			 			new Object[] {numAllConcideredItems,numAllRatedItems});
 		 	}
 		 	
 		 return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
