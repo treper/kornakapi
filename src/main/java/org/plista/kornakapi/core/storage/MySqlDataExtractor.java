@@ -31,7 +31,7 @@ import com.google.common.io.Closeables;
 public class MySqlDataExtractor extends MySqlStorage{
 	
 
-	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 10 && nums <30";
+	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 15 && nums <30";
 	private static final String test = "SELECT * FROM taste_preferences";
 	private static String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
 
