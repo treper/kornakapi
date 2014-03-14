@@ -108,11 +108,17 @@ public class StreamingKMeansClassifierModel {
  		}
 	}
 	
+	/**
+	 * 
+	 * @param itemID
+	 * @return
+	 * @throws IOException
+	 */
 	public WeightedThing<Vector> getClossestCentroid(long itemID) throws IOException{
 		if(itemID2Centroid.containsKey(itemID)){
 			return itemID2Centroid.get(itemID);
 		}else{
-			WeightedThing<Vector> cent = centroids.searchFirst(getVector(itemID), true);
+			WeightedThing<Vector> cent = centroids.searchFirst(getVector(itemID), false);
 			itemID2Centroid.put(itemID, cent);
 			return cent;
 		}	

@@ -14,6 +14,7 @@ import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
+import org.apache.mahout.math.WeightedVector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.KornakapiRecommender;
@@ -88,26 +89,26 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 
 		List<RecommendedItem> result = Lists.newArrayListWithCapacity(itemIDs.length);
 		if(model.getCentroids() == null){
-			throw new TasteException("No centroids computed");
-		}
-		for(long itemID : itemIDs){
-			WeightedThing<Vector> centroid;
-			try {					
-				centroid = model.getClossestCentroid(itemID);
-				float normWeight = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
-				/**
-				 * 
-				 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector
-				 * then volume should be normalized by volume*((Vector)centroid).getNumNonZeroElements/(float)this.model.getMeanVolume() or getMaxVolume
-				 */
-				GenericRecommendedItem item = new GenericRecommendedItem(itemID,  normWeight);
-				result.add(item);
-			} catch (IOException e) {
-			    if (log.isInfoEnabled()) {
-			    	log.info("{}",  e.getMessage()); 			    			
-			    }
+			log.info("No centroids computed");
+		}else{
+			for(long itemID : itemIDs){
+				WeightedVector centroid;
+				try {					
+					centroid = (WeightedVector)model.getClossestCentroid(itemID).getValue();
+					float normWeight = ((float)centroid.getWeight()/(float)model.getMaxWeight()) ;
+					/**
+					 * TODO: new Version of mahout is supposed to allow acces on the centroid as a vector
+					 * then volume should be normalized by volume*((Vector)centroid).getNumNonZeroElements/(float)this.model.getMeanVolume() or getMaxVolume
+					 */
+					GenericRecommendedItem item = new GenericRecommendedItem(itemID,  normWeight);
+					result.add(item);
+				} catch (IOException e){
+				    if (log.isInfoEnabled()) {
+				    	log.info("{}",  e.getMessage()); 			    			
+				    }
+				}
 			}
-		}		
+		}
 		return result;
 	}
 }

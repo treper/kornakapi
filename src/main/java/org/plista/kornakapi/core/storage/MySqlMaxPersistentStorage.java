@@ -111,7 +111,6 @@ public class MySqlMaxPersistentStorage extends MySqlStorage implements Storage {
   public void setPreference(long userID, long itemID, float value) throws IOException {
 	  Connection conn = null;
 	    PreparedStatement stmt = null;
-
 	    try {
 	      conn = dataSource.getConnection();
 	      stmt = conn.prepareStatement(IMPORT_QUERY_MAX);
