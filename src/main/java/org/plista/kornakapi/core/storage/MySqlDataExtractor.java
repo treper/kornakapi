@@ -59,24 +59,28 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
 		 	FastIDSet allItems = new FastIDSet();
 		 	int dim = userids.size();
+		 	int maxNumRatings = 0;
 		 	for(long userid : userids.toArray()){
 		 		String getUserItems = this.GET_USER_ITEMS_BASE + String.valueOf(userid);
 		 		FastIDSet userItems = getQuery(getUserItems);
 		 		allItems.addAll(userItems);
 		 		userItemIds.put(userid, userItems);
+		 		if(maxNumRatings < userItems.size()){
+		 			maxNumRatings = userItems.size();
+		 		}
+		 		
 		 	}
-		 	
 		 	if (log.isInfoEnabled()) {
 			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
 			 	int numAllConcideredItems = allItems.size(); 
-			 	log.info("Creating [{}] Vectors  with [{}] dimensions out of [{}] items ",
-			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems});
+			 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items. MaxNumRatings = [{}]",
+			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems, maxNumRatings});
 		 	}
 		 	
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
-		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, initialCapacity);
+		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, maxNumRatings);
 				int i = 0;
 		 		for(long userid : userids.toArray()){
 		 			
