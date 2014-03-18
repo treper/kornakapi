@@ -68,8 +68,8 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	if (log.isInfoEnabled()) {
 			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
 			 	int numAllConcideredItems = allItems.size(); 
-			 	log.info("Clustering [{}] of [{}] items",
-			 			new Object[] {numAllConcideredItems,numAllRatedItems});
+			 	log.info("Clustering [{}] of [{}] items with [{}] dimensions ",
+			 			new Object[] {numAllConcideredItems,numAllRatedItems, dim});
 		 	}
 		 	
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
