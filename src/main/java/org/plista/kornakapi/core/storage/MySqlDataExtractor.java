@@ -39,6 +39,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 	private static String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
 	private static String GET_ALL_RATED_ITEMS = "SELECT DISTINCT(item_id) FROM taste_preferences";
 	private static final Logger log = LoggerFactory.getLogger(MySqlDataExtractor.class);
+	private static int initialCapacity = 2000;
 
 
 
@@ -68,14 +69,14 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	if (log.isInfoEnabled()) {
 			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
 			 	int numAllConcideredItems = allItems.size(); 
-			 	log.info("Clustering [{}] of [{}] items with [{}] dimensions ",
-			 			new Object[] {numAllConcideredItems,numAllRatedItems, dim});
+			 	log.info("Creating [{}] Vectors  with [{}] dimensions out of [{}] items ",
+			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems});
 		 	}
 		 	
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
-		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, 2000);
+		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, initialCapacity);
 				int i = 0;
 		 		for(long userid : userids.toArray()){
 		 			
@@ -88,10 +89,10 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		vectors.put(n, itemVector);
 		 		n++;	 		
 		 	}
+		 	if (log.isInfoEnabled()) {
+			 	log.info("Done!");
+		 	}
 
-
-
-		 	
 		 return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
 	 }
 	 /**
