@@ -176,6 +176,12 @@ public class BigBangServletContextListener implements ServletContextListener {
             scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
           }
           
+          if (streamingKMeansClustererConf.getRetrainAfterPreferenceChanges() !=
+                  RecommenderConfig.DONT_RETRAIN_ON_PREFERENCE_CHANGES) {
+                preferenceChangeListener.addDelegate(new InMemoryPreferenceChangeListener(scheduler, name,
+                		streamingKMeansClustererConf.getRetrainAfterPreferenceChanges()));
+              }
+          
           log.info("Created StreamingKMeansClusterer [{}] with [{}] minclusters and [{}] cutoff distance",
               new Object[] { name, streamingKMeansClustererConf.getDesiredNumCluster(), streamingKMeansClustererConf.getDistanceCutoff()}); 
       }

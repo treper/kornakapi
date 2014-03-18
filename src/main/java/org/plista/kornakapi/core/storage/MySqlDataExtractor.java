@@ -55,18 +55,26 @@ public class MySqlDataExtractor extends MySqlStorage{
 	  * @return
 	  */
 	 public StreamingKMeansDataObject getData(){	
+		 /**
+		  * get all userids according to the top query
+		  */
 		 	FastIDSet userids = this.getQuery(GET_USER);
 		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
 		 	FastIDSet allItems = new FastIDSet();
 		 	int dim = userids.size();
 		 	int maxNumRatings = 0;
+		 	
+		 	/**
+		 	 * for all users: get all items
+		 	 */
 		 	for(long userid : userids.toArray()){
 		 		String getUserItems = this.GET_USER_ITEMS_BASE + String.valueOf(userid);
 		 		FastIDSet userItems = getQuery(getUserItems);
 		 		allItems.addAll(userItems);
 		 		userItemIds.put(userid, userItems);
 		 		if(maxNumRatings < userItems.size()){
-		 			maxNumRatings = userItems.size();
+		 			maxNumRatings = userItems.size(); 
+		 			// determine max number of ratings in order to preallocate memory dynamically
 		 		}
 		 		
 		 	}
@@ -77,6 +85,10 @@ public class MySqlDataExtractor extends MySqlStorage{
 			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems, maxNumRatings});
 		 	}
 		 	
+		 	
+		 	/**
+		 	 * create a vector for every item as a point in user-space
+		 	 */
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
@@ -130,8 +142,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 
 		 public int getDim(){
 			 return this.dim;
-		 }
-		 
+		 }		 
 	 }
 	 
 	public FastIDSet getQuery(String query){
@@ -160,8 +171,4 @@ public class MySqlDataExtractor extends MySqlStorage{
 		}
 		return candidates;
 	}
-	
-
-
-
 }
