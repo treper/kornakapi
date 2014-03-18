@@ -75,7 +75,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
-		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, dim);
+		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, 2000);
 				int i = 0;
 		 		for(long userid : userids.toArray()){
 		 			
