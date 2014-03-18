@@ -109,47 +109,46 @@ public class MySqlDataExtractor extends MySqlStorage{
 			 	log.info("Done!");
 		 	}
 
-		 return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
+		return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
 	 }
 	 /**
-	  * Data object containing all variables important for the model
-	  * @author maxweule
+	  * Data object containing all important variables
 	  *
 	  */
 	 public class StreamingKMeansDataObject{
-		 private FastIDSet userids;
-		 private HashMap<Long, FastIDSet> userItemIds;
-		 private int dim;
-		 private SparseMatrix matrix;
-		 
-		 public StreamingKMeansDataObject(FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, SparseMatrix matrix, int dim){
-			 this.userids = userids;
-			 this.userItemIds = userItemIds;
-			 this.dim = dim;
-			 this.matrix = matrix;
+		private FastIDSet userids;
+		private HashMap<Long, FastIDSet> userItemIds;
+		private int dim;
+		private SparseMatrix matrix;
+		
+		public StreamingKMeansDataObject(FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, SparseMatrix matrix, int dim){
+			this.userids = userids;
+			this.userItemIds = userItemIds;
+			this.dim = dim;
+			this.matrix = matrix;
 		 }
 		 
-		 public FastIDSet getUserIDs(){
-			 return this.userids;
-		 }
-		 public HashMap<Long, FastIDSet> getUserItemIDs(){
-			 return this.userItemIds;
-		 }
+		public FastIDSet getUserIDs(){
+			return this.userids;
+		}
+		public HashMap<Long, FastIDSet> getUserItemIDs(){
+			return this.userItemIds;
+		}
 		 
-		 public Matrix getMatrix(){
-			 return this.matrix;
-		 }
+		public Matrix getMatrix(){
+			return this.matrix;
+		}
 		 
-		 public int getDim(){
-			 return this.dim;
-		 }		 
-	 }
+		public int getDim(){
+			return this.dim;
+		}		 
+	}
 	 
 	public FastIDSet getQuery(String query){
-		 Connection conn = null;
-		 PreparedStatement stmt = null;
-		 ResultSet rs = null;
-		 FastIDSet candidates = new FastIDSet();
+		Connection conn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		FastIDSet candidates = new FastIDSet();
 		 
 		try {
 		      conn = dataSource.getConnection();

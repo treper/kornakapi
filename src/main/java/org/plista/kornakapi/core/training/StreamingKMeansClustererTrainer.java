@@ -23,7 +23,7 @@ import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataO
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StreamingKMeansClusterer extends AbstractTrainer{
+public class StreamingKMeansClustererTrainer extends AbstractTrainer{
 
 
 	private StreamingKMeansClustererConfig conf = null;
@@ -31,13 +31,20 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 
 	private StorageConfiguration storage;
 	private StreamingKMeansClassifierModel model;
+	int clusters;
+	long cutoff;
+	StreamingKMeans clusterer;
 	
 
-	public StreamingKMeansClusterer(StorageConfiguration storage,StreamingKMeansClustererConfig conf, StreamingKMeansClassifierModel model) throws IOException {
+	public StreamingKMeansClustererTrainer(StorageConfiguration storage,StreamingKMeansClustererConfig conf, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
 		this.conf = conf;
 		this.storage = storage;
 		this.model = model;
+		clusters = conf.getDesiredNumCluster();
+		cutoff = conf.getDistanceCutoff();
+		UpdatableSearcher searcher = new FastProjectionSearch(new ManhattanDistanceMeasure(), 10, 10);
+		clusterer = new StreamingKMeans(searcher, clusters,cutoff);
 	}
 
 	@Override
@@ -48,20 +55,26 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		 */
 	    long start = System.currentTimeMillis();
 		MySqlDataExtractor extractor = new MySqlDataExtractor(storage);
-		int clusters = conf.getDesiredNumCluster();
-		long cutoff = conf.getDistanceCutoff();
 		UpdatableSearcher centroids = null;
-		UpdatableSearcher searcher = new FastProjectionSearch(new ManhattanDistanceMeasure(), 10, 10);
-		StreamingKMeans clusterer = new StreamingKMeans(searcher, clusters,cutoff);
 		StreamingKMeansDataObject data = extractor.getData();
 		extractor.close();
+		this.model.setData(data);
 		centroids = clusterer.cluster(data.getMatrix());		
-		this.model.updateCentroids(data, centroids);
+		this.model.updateCentroids(centroids);
 		long estimateDuration = System.currentTimeMillis() - start;  
 		if (log.isInfoEnabled()) {
 			log.info("Model trained in {} ms", estimateDuration);
-		}		
+		}
+		
 	}
-
+	public void streamNewPoint(Centroid centerTheCentroid){
+	    long start = System.currentTimeMillis();
+		UpdatableSearcher centroids = clusterer.cluster(centerTheCentroid);
+		long estimateDuration = System.currentTimeMillis() - start;  
+		this.model.updateCentroids(centroids);
+		if (log.isInfoEnabled()) {
+			log.info("Model trained in {} ms, created [{}] Clusters", estimateDuration, centroids.size());
+		}
+	}
 }
 

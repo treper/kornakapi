@@ -26,15 +26,18 @@ public class StreamingKMeansClassifierModel {
 	private HashMap<Long, WeightedThing<Vector>> itemID2Centroid = new HashMap<Long, WeightedThing<Vector>>();
 	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierModel.class);
 	
+	
+	public void setData(StreamingKMeansDataObject data){
+		this.userItemIds = data.getUserItemIDs();		
+		this.userids = data.getUserIDs();
+		this.dim = data.getDim();
+	}
 /**
  * Method that updates the model if new centroids are callculated
  * @param data
  * @param centroids
  */
-	public void updateCentroids (StreamingKMeansDataObject data, UpdatableSearcher centroids){
-		this.userItemIds = data.getUserItemIDs();		
-		this.userids = data.getUserIDs();
-		this.dim = data.getDim();		
+	public void updateCentroids (UpdatableSearcher centroids){		
 		this.centroids = centroids;
 		if (log.isInfoEnabled()) {
 			log.info("Computed "+centroids.size()+ " clusters \n");
@@ -61,6 +64,7 @@ public class StreamingKMeansClassifierModel {
 		meanVolume = meanVolume/i;
 		this.itemID2Centroid.clear();
 	}
+
 	public UpdatableSearcher getCentroids(){
 		return this.centroids;
 	}

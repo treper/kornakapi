@@ -52,7 +52,7 @@ import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
-import org.plista.kornakapi.core.training.StreamingKMeansClusterer;
+import org.plista.kornakapi.core.training.StreamingKMeansClustererTrainer;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.plista.kornakapi.core.training.preferencechanges.DelegatingPreferenceChangeListener;
@@ -163,7 +163,7 @@ public class BigBangServletContextListener implements ServletContextListener {
             createEmptyFactorization(persistence);
           }
           StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel(); 
-          StreamingKMeansClusterer clusterer = new StreamingKMeansClusterer(conf.getStorageConfiguration(), streamingKMeansClustererConf, model);
+          StreamingKMeansClustererTrainer clusterer = new StreamingKMeansClustererTrainer(conf.getStorageConfiguration(), streamingKMeansClustererConf, model);
           trainers.put(name,clusterer);
           
           StreamingKMeansClassifierRecommender recommender = new StreamingKMeansClassifierRecommender(model);
