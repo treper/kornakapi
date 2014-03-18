@@ -46,6 +46,7 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		/**
 		 * class to calculate clusters
 		 */
+	    long start = System.currentTimeMillis();
 		MySqlDataExtractor extractor = new MySqlDataExtractor(storage);
 		int clusters = conf.getDesiredNumCluster();
 		long cutoff = conf.getDistanceCutoff();
@@ -56,7 +57,10 @@ public class StreamingKMeansClusterer extends AbstractTrainer{
 		extractor.close();
 		centroids = clusterer.cluster(data.getMatrix());		
 		this.model.updateCentroids(data, centroids);
-		
+		long estimateDuration = System.currentTimeMillis() - start;  
+		if (log.isInfoEnabled()) {
+			log.info("Model trained in {} ms", estimateDuration);
+		}		
 	}
 
 }
