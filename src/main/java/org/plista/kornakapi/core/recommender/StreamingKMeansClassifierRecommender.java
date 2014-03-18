@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.mahout.cf.taste.common.NoSuchItemException;
 import org.apache.mahout.cf.taste.common.Refreshable;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.impl.recommender.GenericRecommendedItem;
@@ -108,6 +109,9 @@ public class StreamingKMeansClassifierRecommender implements KornakapiRecommende
 				    }
 				}
 			}
+		}
+		if(result.size() == 0){
+			throw new NoSuchItemException("Item unkown");
 		}
 		return result;
 	}

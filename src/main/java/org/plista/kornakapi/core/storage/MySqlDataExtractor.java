@@ -64,6 +64,14 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		allItems.addAll(userItems);
 		 		userItemIds.put(userid, userItems);
 		 	}
+		 	
+		 	if (log.isInfoEnabled()) {
+			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
+			 	int numAllConcideredItems = allItems.size(); 
+			 	log.info("Clustering [{}] of [{}] items",
+			 			new Object[] {numAllConcideredItems,numAllRatedItems});
+		 	}
+		 	
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
@@ -82,12 +90,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	}
 
 
-		 	if (log.isInfoEnabled()) {
-			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
-			 	int numAllConcideredItems = allItems.size(); 
-			 	log.info("Clustering [{}] of [{}] items",
-			 			new Object[] {numAllConcideredItems,numAllRatedItems});
-		 	}
+
 		 	
 		 return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
 	 }
