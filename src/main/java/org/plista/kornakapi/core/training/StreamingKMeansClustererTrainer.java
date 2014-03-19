@@ -12,9 +12,6 @@ import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
 public class StreamingKMeansClustererTrainer extends AbstractTrainer{
 
 
-
-	int clusters;
-	long cutoff;
 	StramingKMeansClusterer clusterer;
 	long start;
 	private boolean firstTraining = true;
@@ -22,7 +19,7 @@ public class StreamingKMeansClustererTrainer extends AbstractTrainer{
 
 	public StreamingKMeansClustererTrainer(StreamingKMeansClustererConfig conf, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
-		clusterer = new StramingKMeansClusterer(model, clusters, cutoff);
+		clusterer = new StramingKMeansClusterer(model, conf.getDesiredNumCluster(), conf.getDistanceCutoff());
 	    start = System.currentTimeMillis();
 		
 

@@ -168,7 +168,7 @@ public class StreamingKMeansClassifierModel {
 			}
 		}
 	    if (log.isInfoEnabled()) {
-	    	log.info("Added [{}] new Items", itemVectors.size()) ;			    			
+	    	log.info("Adding [{}] new Items", itemVectors.size()) ;			    			
 	    }
 		this.allItems = data.getAllItems();
 		return itemVectors;
@@ -184,9 +184,6 @@ public class StreamingKMeansClassifierModel {
 			e1.printStackTrace();
 		}
 		this.setData(data);
-
-		
-
 	 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 	 	int n = 0;
 	 	for(long itemId : allItems.toArray()){
