@@ -5,7 +5,6 @@ import java.util.List;
 import org.apache.mahout.clustering.streaming.cluster.StreamingKMeans;
 import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.apache.mahout.math.Centroid;
-import org.apache.mahout.math.SparseMatrix;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.plista.kornakapi.core.storage.MySqlDataExtractor;
@@ -33,7 +32,7 @@ public class StramingKMeansClusterer {
 	 */
 	public void cluster(){
 	    long start = System.currentTimeMillis();
-		SparseMatrix data = model.getData();
+	    List<Centroid> data = model.getData();
 		UpdatableSearcher centroids = clusterer.cluster(data);
 		long estimateDuration = System.currentTimeMillis() - start;  
 		if (log.isInfoEnabled()) {
