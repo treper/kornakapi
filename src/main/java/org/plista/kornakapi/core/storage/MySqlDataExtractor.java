@@ -8,11 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.common.IOUtils;
-import org.apache.mahout.math.RandomAccessSparseVector;
-import org.apache.mahout.math.SparseMatrix;
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +47,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
 		 	FastIDSet allItems = new FastIDSet();
 		 	int dim = userids.size();
-		 	int maxNumRatings = 0;
+
 		 	
 		 	/**
 		 	 * for all users: get all items
@@ -60,17 +57,13 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		FastIDSet userItems = getQuery(getUserItems);
 		 		allItems.addAll(userItems);
 		 		userItemIds.put(userid, userItems);
-		 		if(maxNumRatings < userItems.size()){
-		 			maxNumRatings = userItems.size(); 
-		 			// determine max number of ratings in order to preallocate memory dynamically
-		 		}
 		 		
 		 	}
 		 	if (log.isInfoEnabled()) {
 			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
 			 	int numAllConcideredItems = allItems.size(); 
-			 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items. MaxNumRatings = [{}]",
-			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems, maxNumRatings});
+			 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items.",
+			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems});
 		 	}
 		 	
 		 	
@@ -176,8 +169,8 @@ public class MySqlDataExtractor extends MySqlStorage{
 	 	if (log.isInfoEnabled()) {
 		 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
 		 	int numAllConcideredItems = allItems.size(); 
-		 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items. MaxNumRatings = [{}]",
-		 			new Object[] {numAllConcideredItems, numAllRatedItems, });
+		 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items.",
+		 			new Object[] {numAllConcideredItems,dim, numAllRatedItems });
 	 	}
 	 	return new StreamingKMeansDataObject(allItems, userIDs, userItemIds, dim );
 	}

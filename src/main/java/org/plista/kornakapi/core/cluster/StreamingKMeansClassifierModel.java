@@ -31,6 +31,7 @@ public class StreamingKMeansClassifierModel {
 	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierModel.class);
 	private StorageConfiguration conf;
 	private FastIDSet allItems;
+	private int initialDim = 300;
 	
 	public StreamingKMeansClassifierModel(StorageConfiguration conf){
 		this.conf = conf;
@@ -96,7 +97,7 @@ public class StreamingKMeansClassifierModel {
 	 * @throws IOException 
 	 */
 	public SequentialAccessSparseVector createVector(long itemId) throws IOException{
-		SequentialAccessSparseVector itemVector = new SequentialAccessSparseVector(dim, dim);
+		SequentialAccessSparseVector itemVector = new SequentialAccessSparseVector(dim, initialDim);
 		int i = 0;
 		boolean isRated = false;
  		for(long userid : userids.toArray()){ 			
