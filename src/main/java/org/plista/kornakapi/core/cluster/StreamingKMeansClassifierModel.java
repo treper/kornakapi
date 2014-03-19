@@ -14,8 +14,8 @@ import org.apache.mahout.math.WeightedVector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.core.config.StorageConfiguration;
-import org.plista.kornakapi.core.storage.MySqlDataExtractor;
-import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataObject;
+import org.plista.kornakapi.core.storage.MySqlKMeansDataFilter;
+import org.plista.kornakapi.core.storage.MySqlKMeansDataFilter.StreamingKMeansDataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +134,7 @@ public class StreamingKMeansClassifierModel {
 	 * @return
 	 */
 	public List<Centroid> getNewData(){
-		MySqlDataExtractor extractor = new MySqlDataExtractor(conf);
+		MySqlKMeansDataFilter extractor = new MySqlKMeansDataFilter(conf);
 		StreamingKMeansDataObject data = extractor.getNewData(userids, dim);
 		try {
 			extractor.close();
@@ -174,7 +174,7 @@ public class StreamingKMeansClassifierModel {
 	}
 	
 	public ArrayList<Centroid> getData(){
-		MySqlDataExtractor extractor = new MySqlDataExtractor(conf);
+		MySqlKMeansDataFilter extractor = new MySqlKMeansDataFilter(conf);
 		StreamingKMeansDataObject data = extractor.getData();
 		try {
 			extractor.close();
