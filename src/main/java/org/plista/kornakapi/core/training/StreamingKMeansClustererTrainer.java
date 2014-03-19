@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.mahout.cf.taste.model.DataModel;
-import org.plista.kornakapi.core.cluster.StramingKMeansClusterer;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
 public class StreamingKMeansClustererTrainer extends AbstractTrainer{

@@ -1,4 +1,4 @@
-package org.plista.kornakapi.core.cluster;
+package org.plista.kornakapi.core.training;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import org.apache.mahout.common.distance.ManhattanDistanceMeasure;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.neighborhood.FastProjectionSearch;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

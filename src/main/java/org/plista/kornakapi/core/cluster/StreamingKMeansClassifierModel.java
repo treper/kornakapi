@@ -87,9 +87,7 @@ public class StreamingKMeansClassifierModel {
 	public double getMeanVolume(){
 		return this.meanVolume;
 	}
-		
-
-		
+			
 	/**
 	 * Returns the SequentialAccessSparseVector of an item id
 	 * @param itemId

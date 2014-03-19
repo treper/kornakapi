@@ -61,9 +61,7 @@ import javax.servlet.ServletContextListener;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
-import java.sql.Connection;
 
 /** servlet context listener to initialize/shut down the application */
 public class BigBangServletContextListener implements ServletContextListener {

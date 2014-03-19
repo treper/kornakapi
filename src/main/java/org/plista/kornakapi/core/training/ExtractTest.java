@@ -2,6 +2,7 @@ package org.plista.kornakapi.core.training;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.Configuration;
 
