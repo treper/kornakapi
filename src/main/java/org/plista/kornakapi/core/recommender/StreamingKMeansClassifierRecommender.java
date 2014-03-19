@@ -2,7 +2,7 @@ package org.plista.kornakapi.core.recommender;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
+
 import java.util.List;
 
 import org.apache.mahout.cf.taste.common.NoSuchItemException;
@@ -12,15 +12,9 @@ import org.apache.mahout.cf.taste.impl.recommender.GenericRecommendedItem;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.IDRescorer;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.math.Centroid;
-import org.apache.mahout.math.RandomAccessSparseVector;
-import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.WeightedVector;
-import org.apache.mahout.math.neighborhood.UpdatableSearcher;
-import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
-import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

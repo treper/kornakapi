@@ -2,13 +2,8 @@ package org.plista.kornakapi.core.training;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.apache.mahout.math.Centroid;
-import org.apache.mahout.math.RandomAccessSparseVector;
-import org.apache.mahout.math.WeightedVector;
 import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.Configuration;
-import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;

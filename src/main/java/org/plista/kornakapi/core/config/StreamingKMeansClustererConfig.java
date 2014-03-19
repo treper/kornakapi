@@ -1,6 +1,5 @@
 package org.plista.kornakapi.core.config;
 
-import org.apache.mahout.common.distance.DistanceMeasure;
 
 public class StreamingKMeansClustererConfig extends RecommenderConfig{	
 	

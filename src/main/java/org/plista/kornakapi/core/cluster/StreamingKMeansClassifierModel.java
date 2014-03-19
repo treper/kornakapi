@@ -5,18 +5,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.RandomAccessSparseVector;
+import org.apache.mahout.math.SequentialAccessSparseVector;
+import org.apache.mahout.math.SparseMatrix;
 import org.apache.mahout.math.Vector;
 import org.apache.mahout.math.WeightedVector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
 import org.plista.kornakapi.core.config.StorageConfiguration;
-import org.plista.kornakapi.core.recommender.StreamingKMeansClassifierRecommender;
 import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataObject;
 import org.slf4j.Logger;
@@ -93,13 +92,13 @@ public class StreamingKMeansClassifierModel {
 
 		
 	/**
-	 * Returns the RandomAccessSparseVector of an item id
+	 * Returns the SequentialAccessSparseVector of an item id
 	 * @param itemId
 	 * @return RandomAccessSparseVector
 	 * @throws IOException 
 	 */
-	public RandomAccessSparseVector createVector(long itemId) throws IOException{
-		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, dim);
+	public SequentialAccessSparseVector createVector(long itemId) throws IOException{
+		SequentialAccessSparseVector itemVector = new SequentialAccessSparseVector(dim, dim);
 		int i = 0;
 		boolean isRated = false;
  		for(long userid : userids.toArray()){ 			
@@ -146,41 +145,76 @@ public class StreamingKMeansClassifierModel {
 			e1.printStackTrace();
 		}
 		
+		/**
+		 * new items might only exist in the new userspace/coordinate system
+		 * but not in the old one wich is still used in this method and remains unchanged.
+		 * Therefore new items might not be concidered here
+		 */
 		ArrayList<Centroid> itemVectors = new ArrayList<Centroid>();
 		if(!this.allItems.equals(data.getAllItems())){
 			int i = 0;
-			for(Long itemID :data.getAllItems()){
+			for(Long itemID :data.getAllItems()){ 
 				if(!allItems.contains(itemID)){
 					try {
 						itemVectors.add(new Centroid(new WeightedVector(createVector(itemID), 1,i)));
 						i++;
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					    if (log.isInfoEnabled()) {
+					    	log.info(e.getMessage()) ;			    			
+					    }
+
 					}
 				}
 			}
 		}
+	    if (log.isInfoEnabled()) {
+	    	log.info("Added [{}] new Items", itemVectors.size()) ;			    			
+	    }
+		this.allItems = data.getAllItems();
 		return itemVectors;
 	}
 	
-	public List<Centroid> getData(){
+	public SparseMatrix getData(){
 		MySqlDataExtractor extractor = new MySqlDataExtractor(conf);
 		StreamingKMeansDataObject data = extractor.getData();
-		this.setData(data);
-		
 		try {
 			extractor.close();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		this.setData(data);
+
 		
+
+	 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
+	 	int n = 0;
+	 	for(long itemId : allItems.toArray()){
+	 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, 300);
+			int i = 0;
+	 		for(long userid : userids.toArray()){
+	 			
+	 			FastIDSet itemIds = userItemIds.get(userid);
+	 			if(itemIds.contains(itemId)){
+	 				itemVector.set(i, 1);
+	 			}
+	 			i++;
+	 		}
+	 		vectors.put(n, itemVector);
+	 		n++;	 		
+	 	}
+	 	if (log.isInfoEnabled()) {
+		 	log.info("Done!");
+	 	}
+		return new SparseMatrix(n,dim,vectors);
+	}
+		
+		/**	
 		ArrayList<Centroid> itemVectors = new ArrayList<Centroid>();
 		int n = 0;
 	 	for(long itemId : allItems.toArray()){
 	 		try {
-	 			RandomAccessSparseVector itemVector = createVector(itemId);
+	 			SequentialAccessSparseVector itemVector = createVector(itemId);
 				itemVectors.add(new Centroid(new WeightedVector(itemVector, 1,n))); 
 				n++;
 			} catch (IOException e) {
@@ -192,5 +226,6 @@ public class StreamingKMeansClassifierModel {
 		 	log.info("Done!");
 	 	}
 	 	return itemVectors;
-	}
+	 	**/
+	
 }

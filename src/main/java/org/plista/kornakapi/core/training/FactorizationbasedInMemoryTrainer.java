@@ -20,7 +20,6 @@ import org.apache.mahout.cf.taste.impl.recommender.svd.Factorization;
 import org.apache.mahout.cf.taste.impl.recommender.svd.FilePersistenceStrategy;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
-import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
