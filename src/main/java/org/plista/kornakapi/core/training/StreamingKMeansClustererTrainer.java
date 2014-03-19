@@ -14,11 +14,13 @@ public class StreamingKMeansClustererTrainer extends AbstractTrainer{
 	StramingKMeansClusterer clusterer;
 	long start;
 	private boolean firstTraining = true;
+	private long clusterTimeWindow;
 	
 
 	public StreamingKMeansClustererTrainer(StreamingKMeansClustererConfig conf, StreamingKMeansClassifierModel model) throws IOException {
 		super(conf);
 		clusterer = new StramingKMeansClusterer(model, conf.getDesiredNumCluster(), conf.getDistanceCutoff());
+		clusterTimeWindow = conf.getClusterTimeWindow();
 	    start = System.currentTimeMillis();
 		
 
@@ -28,7 +30,7 @@ public class StreamingKMeansClustererTrainer extends AbstractTrainer{
 	protected void doTrain(File targetFile, DataModel inmemoryData,
 			int numProcessors) throws IOException {
 
-		if(start - System.currentTimeMillis() > 43200000 || firstTraining){ //if 12 hours passed retrain hole model
+		if(start - System.currentTimeMillis() > clusterTimeWindow || firstTraining){ //if 12 hours passed retrain hole model
 			clusterer.cluster();
 			start = System.currentTimeMillis();
 			firstTraining = false;
