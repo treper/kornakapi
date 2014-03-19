@@ -35,10 +35,10 @@ public class StramingKMeansClusterer {
 	    List<Centroid> data = model.getData();
 		UpdatableSearcher centroids = clusterer.cluster(data);
 		long estimateDuration = System.currentTimeMillis() - start;  
+		this.model.updateCentroids(centroids);
 		if (log.isInfoEnabled()) {
 			log.info("Model trained in {} ms, created [{}] Clusters", estimateDuration, centroids.size());
 		}
-		this.model.updateCentroids(centroids);
 	}
 	/**
 	 * just stream new available data-points into old coordinate system
@@ -48,9 +48,9 @@ public class StramingKMeansClusterer {
 		List<Centroid> data = model.getNewData();
 		UpdatableSearcher centroids = clusterer.cluster(data);
 		long estimateDuration = System.currentTimeMillis() - start;  
+		this.model.updateCentroids(centroids);	
 		if (log.isInfoEnabled()) {
 			log.info("Model trained in {} ms, created [{}] Clusters", estimateDuration, centroids.size());
 		}
-		this.model.updateCentroids(centroids);		
 	}
 }

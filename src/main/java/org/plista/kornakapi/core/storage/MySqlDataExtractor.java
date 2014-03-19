@@ -65,33 +65,6 @@ public class MySqlDataExtractor extends MySqlStorage{
 			 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items.",
 			 			new Object[] {numAllConcideredItems, dim, numAllRatedItems});
 		 	}
-		 	
-		 	
-		 	/**
-		 	 * create a vector for every item as a point in user-space
-		 	 */
-		 	/**
-		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
-		 	int n = 0;
-		 	for(long itemId : allItems.toArray()){
-		 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, maxNumRatings);
-				int i = 0;
-		 		for(long userid : userids.toArray()){
-		 			
-		 			FastIDSet itemIds = userItemIds.get(userid);
-		 			if(itemIds.contains(itemId)){
-		 				itemVector.set(i, 1);
-		 			}
-		 			i++;
-		 		}
-		 		vectors.put(n, itemVector);
-		 		n++;	 		
-		 	}
-		 	if (log.isInfoEnabled()) {
-			 	log.info("Done!");
-		 	}
-		 	**/
-
 		return new StreamingKMeansDataObject(allItems, userids, userItemIds, dim );
 	 }
 
