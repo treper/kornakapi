@@ -115,6 +115,7 @@ public class StreamingKMeansClassifierModel {
  		}
 	}
 	
+	
 	/**
 	 * 
 	 * @param itemID
@@ -143,6 +144,7 @@ public class StreamingKMeansClassifierModel {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		this.userItemIds = data.getUserItemIDs();
 		
 		/**
 		 * new items might only exist in the new userspace/coordinate system
