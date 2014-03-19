@@ -68,8 +68,8 @@ public class StreamingKMeansClassifierModel {
 			meanVolume += cent.getWeight()/maxWeight* cent.getNumNonZeroElements();
 			i++;
 		    if (log.isInfoEnabled()) {
-		    	log.info("Weight= [{}], l2norm= [{}], Number of Users= [{}] Volume= [{}]",
-		    			new Object[] {cent.getWeight(), cent.norm(2),cent.getNumNonZeroElements() , (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements() }); 			    			
+		    	log.info("NormWeight= [{}], l2norm= [{}], Number of Users= [{}] Volume= [{}]",
+		    			new Object[] {cent.getWeight()/this.maxWeight, cent.norm(2),cent.getNumNonZeroElements() , (cent.getWeight()/maxWeight)* cent.getNumNonZeroElements() }); 			    			
 		    }
 		}
 		meanVolume = meanVolume/i;

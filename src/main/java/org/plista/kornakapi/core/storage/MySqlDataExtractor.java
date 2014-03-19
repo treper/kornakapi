@@ -56,8 +56,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 		String getUserItems = GET_USER_ITEMS_BASE + String.valueOf(userid);
 		 		FastIDSet userItems = getQuery(getUserItems);
 		 		allItems.addAll(userItems);
-		 		userItemIds.put(userid, userItems);
-		 		
+		 		userItemIds.put(userid, userItems);		 		
 		 	}
 		 	if (log.isInfoEnabled()) {
 			 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
@@ -84,7 +83,6 @@ public class MySqlDataExtractor extends MySqlStorage{
 			this.userids = userids;
 			this.userItemIds = userItemIds;
 			this.dim = dim;
-
 		 }
 		 
 		public FastIDSet getUserIDs(){
