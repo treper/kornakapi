@@ -1,16 +1,23 @@
 package org.plista.kornakapi.core.cluster;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.math.Centroid;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.Vector;
+import org.apache.mahout.math.WeightedVector;
 import org.apache.mahout.math.neighborhood.UpdatableSearcher;
 import org.apache.mahout.math.random.WeightedThing;
+import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.plista.kornakapi.core.recommender.StreamingKMeansClassifierRecommender;
+import org.plista.kornakapi.core.storage.MySqlDataExtractor;
 import org.plista.kornakapi.core.storage.MySqlDataExtractor.StreamingKMeansDataObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +32,18 @@ public class StreamingKMeansClassifierModel {
 	private int dim=0;
 	private HashMap<Long, WeightedThing<Vector>> itemID2Centroid = new HashMap<Long, WeightedThing<Vector>>();
 	private static final Logger log = LoggerFactory.getLogger(StreamingKMeansClassifierModel.class);
+	private StorageConfiguration conf;
+	private FastIDSet allItems;
 	
+	public StreamingKMeansClassifierModel(StorageConfiguration conf){
+		this.conf = conf;
+	}
 	
 	public void setData(StreamingKMeansDataObject data){
 		this.userItemIds = data.getUserItemIDs();		
 		this.userids = data.getUserIDs();
 		this.dim = data.getDim();
+		this.allItems = data.getAllItems();
 	}
 /**
  * Method that updates the model if new centroids are callculated
@@ -77,15 +90,7 @@ public class StreamingKMeansClassifierModel {
 		return this.meanVolume;
 	}
 		
-/**
- * 
- * @param itemId
- * @return
- * @throws IOException
- */
-	public RandomAccessSparseVector getVector(long itemId) throws IOException{
-			return  createVector(itemId);
-	}
+
 		
 	/**
 	 * Returns the RandomAccessSparseVector of an item id
@@ -93,7 +98,7 @@ public class StreamingKMeansClassifierModel {
 	 * @return RandomAccessSparseVector
 	 * @throws IOException 
 	 */
-	private RandomAccessSparseVector createVector(long itemId) throws IOException{
+	public RandomAccessSparseVector createVector(long itemId) throws IOException{
 		RandomAccessSparseVector itemVector = new RandomAccessSparseVector(dim, dim);
 		int i = 0;
 		boolean isRated = false;
@@ -122,9 +127,70 @@ public class StreamingKMeansClassifierModel {
 		if(itemID2Centroid.containsKey(itemID)){
 			return itemID2Centroid.get(itemID);
 		}else{
-			WeightedThing<Vector> cent = centroids.searchFirst(getVector(itemID), false);
+			WeightedThing<Vector> cent = centroids.searchFirst(createVector(itemID), false);
 			itemID2Centroid.put(itemID, cent);
 			return cent;
 		}	
-	}	
+	}
+	/**
+	 * 
+	 * @return
+	 */
+	public List<Centroid> getNewData(){
+		MySqlDataExtractor extractor = new MySqlDataExtractor(conf);
+		StreamingKMeansDataObject data = extractor.getData();
+		try {
+			extractor.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		ArrayList<Centroid> itemVectors = new ArrayList<Centroid>();
+		if(!this.allItems.equals(data.getAllItems())){
+			int i = 0;
+			for(Long itemID :data.getAllItems()){
+				if(!allItems.contains(itemID)){
+					try {
+						itemVectors.add(new Centroid(new WeightedVector(createVector(itemID), 1,i)));
+						i++;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return itemVectors;
+	}
+	
+	public List<Centroid> getData(){
+		MySqlDataExtractor extractor = new MySqlDataExtractor(conf);
+		StreamingKMeansDataObject data = extractor.getData();
+		this.setData(data);
+		
+		try {
+			extractor.close();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		ArrayList<Centroid> itemVectors = new ArrayList<Centroid>();
+		int n = 0;
+	 	for(long itemId : allItems.toArray()){
+	 		try {
+	 			RandomAccessSparseVector itemVector = createVector(itemId);
+				itemVectors.add(new Centroid(new WeightedVector(itemVector, 1,n))); 
+				n++;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	 	}
+	 	if (log.isInfoEnabled()) {
+		 	log.info("Done!");
+	 	}
+	 	return itemVectors;
+	}
 }

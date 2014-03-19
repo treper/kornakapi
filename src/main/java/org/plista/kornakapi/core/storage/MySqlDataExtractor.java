@@ -2,32 +2,24 @@ package org.plista.kornakapi.core.storage;
 
 
 
-import java.io.IOException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.mahout.cf.taste.impl.common.FastIDSet;
 import org.apache.mahout.common.IOUtils;
 import org.apache.mahout.math.Matrix;
 import org.apache.mahout.math.RandomAccessSparseVector;
 import org.apache.mahout.math.SparseMatrix;
-import org.apache.mahout.math.Vector;
-import org.apache.mahout.math.VectorWritable;
-import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
+
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.SequenceFile;
 
-import com.google.common.io.Closeables;
 
 
 
@@ -89,6 +81,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	/**
 		 	 * create a vector for every item as a point in user-space
 		 	 */
+		 	/**
 		 	HashMap<Integer, RandomAccessSparseVector> vectors = new HashMap<Integer, RandomAccessSparseVector>();
 		 	int n = 0;
 		 	for(long itemId : allItems.toArray()){
@@ -108,9 +101,11 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 	if (log.isInfoEnabled()) {
 			 	log.info("Done!");
 		 	}
+		 	**/
 
-		return new StreamingKMeansDataObject(userids, userItemIds, new SparseMatrix(n,dim,vectors), dim);
+		return new StreamingKMeansDataObject(allItems, userids, userItemIds, dim);
 	 }
+
 	 /**
 	  * Data object containing all important variables
 	  *
@@ -119,13 +114,13 @@ public class MySqlDataExtractor extends MySqlStorage{
 		private FastIDSet userids;
 		private HashMap<Long, FastIDSet> userItemIds;
 		private int dim;
-		private SparseMatrix matrix;
+		private FastIDSet allItems;
 		
-		public StreamingKMeansDataObject(FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, SparseMatrix matrix, int dim){
+		public StreamingKMeansDataObject(FastIDSet allItems, FastIDSet userids, HashMap<Long, FastIDSet> userItemIds, int dim){
+			this.allItems = allItems;
 			this.userids = userids;
 			this.userItemIds = userItemIds;
 			this.dim = dim;
-			this.matrix = matrix;
 		 }
 		 
 		public FastIDSet getUserIDs(){
@@ -135,13 +130,12 @@ public class MySqlDataExtractor extends MySqlStorage{
 			return this.userItemIds;
 		}
 		 
-		public Matrix getMatrix(){
-			return this.matrix;
-		}
-		 
 		public int getDim(){
 			return this.dim;
-		}		 
+		}		
+		public FastIDSet getAllItems(){
+			return this.allItems;
+		}
 	}
 	 
 	public FastIDSet getQuery(String query){

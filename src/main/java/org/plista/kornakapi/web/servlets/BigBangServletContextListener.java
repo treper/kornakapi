@@ -162,8 +162,8 @@ public class BigBangServletContextListener implements ServletContextListener {
           if (!modelFile.exists()) {
             createEmptyFactorization(persistence);
           }
-          StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel(); 
-          StreamingKMeansClustererTrainer clusterer = new StreamingKMeansClustererTrainer(conf.getStorageConfiguration(), streamingKMeansClustererConf, model);
+          StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel(conf.getStorageConfiguration()); 
+          StreamingKMeansClustererTrainer clusterer = new StreamingKMeansClustererTrainer( streamingKMeansClustererConf, model);
           trainers.put(name,clusterer);
           
           StreamingKMeansClassifierRecommender recommender = new StreamingKMeansClassifierRecommender(model);

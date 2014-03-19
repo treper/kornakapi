@@ -31,11 +31,10 @@ public class ExtractTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		MySqlDataExtractor extractor = new MySqlDataExtractor(conf.getStorageConfiguration());
 		StreamingKMeansClustererTrainer clusterer = null;
-		StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel();
+		StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel(conf.getStorageConfiguration());
 		try {
-			clusterer = new StreamingKMeansClustererTrainer(conf.getStorageConfiguration(), conf.getStreamingKMeansClusterer().iterator().next(), model);
+			clusterer = new StreamingKMeansClustererTrainer(conf.getStreamingKMeansClusterer().iterator().next(), model);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -46,11 +45,6 @@ public class ExtractTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		RandomAccessSparseVector hans = new RandomAccessSparseVector(12, 23);
-		WeightedVector peter = new WeightedVector(hans,1,1);  
-		hans.set(5, 10);
-		Centroid hanspeter = new Centroid(peter);
-		clusterer.streamNewPoint(hanspeter);
 	}
 
 }
