@@ -171,7 +171,7 @@ public class StreamingKMeansClassifierModel {
 	    if (log.isInfoEnabled()) {
 	    	log.info("Adding [{}] new Items", itemVectors.size()) ;			    			
 	    }
-		this.setData(data);
+		this.allItems = data.getAllItems();
 		return itemVectors;
 	}
 	

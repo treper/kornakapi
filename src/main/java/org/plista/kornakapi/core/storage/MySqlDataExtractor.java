@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class MySqlDataExtractor extends MySqlStorage{
 	
 
-	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 20";
+	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 10";
 	private static final String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
 	private static final String GET_ALL_RATED_ITEMS = "SELECT DISTINCT(item_id) FROM taste_preferences";
 	private static final Logger log = LoggerFactory.getLogger(MySqlDataExtractor.class);
