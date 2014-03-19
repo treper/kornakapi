@@ -20,10 +20,11 @@ import org.slf4j.LoggerFactory;
 public class MySqlDataExtractor extends MySqlStorage{
 	
 
-	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums > 5";
+	private static final String GET_USER = "select user_id from (SELECT user_id, COUNT(user_id) AS nums FROM taste_preferences GROUP BY user_id ORDER BY nums DESC) as ns where nums >";
 	private static final String GET_USER_ITEMS_BASE = "SELECT item_id FROM taste_preferences WHERE user_id = ";
 	private static final String GET_ALL_RATED_ITEMS = "SELECT DISTINCT(item_id) FROM taste_preferences";
 	private static final Logger log = LoggerFactory.getLogger(MySqlDataExtractor.class);
+	private int minNumUserRatings;
 	//private static int initialCapacity = 2000;
 	//private static final String test = "SELECT * FROM taste_preferences";
 
@@ -34,6 +35,7 @@ public class MySqlDataExtractor extends MySqlStorage{
  */
 	 public MySqlDataExtractor(StorageConfiguration storageConf){
 			super(storageConf);
+			this.minNumUserRatings = storageConf.getMinNumUserRatings();
 	  }
 	 /**
 	  * 
@@ -43,7 +45,7 @@ public class MySqlDataExtractor extends MySqlStorage{
 		 /**
 		  * get all userids according to the top query
 		  */
-		 	FastIDSet userids = this.getQuery(GET_USER);
+		 	FastIDSet userids = this.getQuery(GET_USER + String.valueOf(minNumUserRatings));
 		 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
 		 	FastIDSet allItems = new FastIDSet();
 		 	int dim = userids.size();
