@@ -135,7 +135,7 @@ public class StreamingKMeansClassifierModel {
 	 */
 	public List<Centroid> getNewData(){
 		MySqlDataExtractor extractor = new MySqlDataExtractor(conf);
-		StreamingKMeansDataObject data = extractor.getData();
+		StreamingKMeansDataObject data = extractor.getNewData(userids, dim);
 		try {
 			extractor.close();
 		} catch (IOException e1) {
@@ -168,7 +168,7 @@ public class StreamingKMeansClassifierModel {
 	    if (log.isInfoEnabled()) {
 	    	log.info("Adding [{}] new Items", itemVectors.size()) ;			    			
 	    }
-		this.allItems = data.getAllItems();
+		this.setData(data);
 		return itemVectors;
 	}
 	

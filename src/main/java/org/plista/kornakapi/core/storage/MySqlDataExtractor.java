@@ -163,4 +163,22 @@ public class MySqlDataExtractor extends MySqlStorage{
 		}
 		return candidates;
 	}
+	
+	public StreamingKMeansDataObject getNewData(FastIDSet userIDs, int dim){
+	 	HashMap<Long, FastIDSet> userItemIds = new HashMap<Long, FastIDSet>();
+	 	FastIDSet allItems = new FastIDSet();
+	 	for(long userid : userIDs.toArray()){
+	 		String getUserItems = GET_USER_ITEMS_BASE + String.valueOf(userid);
+	 		FastIDSet userItems = getQuery(getUserItems);
+	 		allItems.addAll(userItems);
+	 		userItemIds.put(userid, userItems);	 		
+	 	}
+	 	if (log.isInfoEnabled()) {
+		 	int numAllRatedItems = this.getQuery(GET_ALL_RATED_ITEMS).size();
+		 	int numAllConcideredItems = allItems.size(); 
+		 	log.info("Creating [{}] Vectors with [{}] dimensions out of [{}] items. MaxNumRatings = [{}]",
+		 			new Object[] {numAllConcideredItems, numAllRatedItems, });
+	 	}
+	 	return new StreamingKMeansDataObject(allItems, userIDs, userItemIds, dim );
+	}
 }
