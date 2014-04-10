@@ -130,7 +130,7 @@ public class StreamingKMeansClassifierModel {
 		}	
 	}
 	/**
-	 * 
+	 * Gets data in old coordinate system
 	 * @return
 	 */
 	public List<Centroid> getNewData(){
@@ -173,6 +173,11 @@ public class StreamingKMeansClassifierModel {
 		return itemVectors;
 	}
 	
+	
+	/**
+	 * Gets data in new coordinate system
+	 * @return
+	 */
 	public ArrayList<Centroid> getData(){
 		MySqlKMeansDataFilter extractor = new MySqlKMeansDataFilter(conf);
 		StreamingKMeansDataObject data = extractor.getData();

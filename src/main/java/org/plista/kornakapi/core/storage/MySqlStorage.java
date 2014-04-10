@@ -159,7 +159,12 @@ public class MySqlStorage implements Storage {
       stmt.execute();
 
     } catch (SQLException e) {
-      throw new IOException(e);
+	    if (log.isInfoEnabled()) {
+	    	log.info(e.getMessage()); 			    			
+	    }else{
+	    	throw new IOException(e);
+	    }
+      
     } finally {
       IOUtils.quietClose(stmt);
       IOUtils.quietClose(conn);
