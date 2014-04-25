@@ -31,12 +31,15 @@ import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.recommender.CandidateItemsStrategy;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 import org.plista.kornakapi.KornakapiRecommender;
+import org.plista.kornakapi.core.cluster.StreamingKMeansClassifierModel;
 import org.plista.kornakapi.core.config.RecommenderConfig;
 import org.plista.kornakapi.core.recommender.CachingAllUnknownItemsCandidateItemsStrategy;
 import org.plista.kornakapi.core.recommender.FoldingFactorizationBasedRecommender;
+import org.plista.kornakapi.core.recommender.StreamingKMeansClassifierRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.config.FactorizationbasedRecommenderConfig;
 import org.plista.kornakapi.core.config.ItembasedRecommenderConfig;
+import org.plista.kornakapi.core.config.StreamingKMeansClustererConfig;
 import org.plista.kornakapi.core.recommender.ItemSimilarityBasedRecommender;
 import org.plista.kornakapi.core.storage.CandidateCacheStorageDecorator;
 import org.plista.kornakapi.core.storage.MySqlMaxPersistentStorage;
@@ -44,6 +47,7 @@ import org.plista.kornakapi.core.storage.MySqlStorage;
 import org.plista.kornakapi.core.storage.Storage;
 import org.plista.kornakapi.core.training.FactorizationbasedInMemoryTrainer;
 import org.plista.kornakapi.core.training.MultithreadedItembasedInMemoryTrainer;
+import org.plista.kornakapi.core.training.StreamingKMeansClustererTrainer;
 import org.plista.kornakapi.core.training.Trainer;
 import org.plista.kornakapi.core.training.TrainingScheduler;
 import org.plista.kornakapi.core.training.preferencechanges.DelegatingPreferenceChangeListener;
@@ -65,6 +69,8 @@ public class BigBangServletContextListener implements ServletContextListener {
   private static final String CONFIG_PROPERTY = "kornakapi.conf";
 
   private static final Logger log = LoggerFactory.getLogger(BigBangServletContextListener.class);
+  
+
 
   @Override
   public void contextInitialized(ServletContextEvent event) {
@@ -80,6 +86,7 @@ public class BigBangServletContextListener implements ServletContextListener {
       Configuration conf = Configuration.fromXML(Files.toString(configFile, Charsets.UTF_8));
 
       Preconditions.checkState(conf.getNumProcessorsForTraining() > 0, "need at least one processor for training!");
+
       
       Storage storage;
       if(conf.getMaxPersistence()){
@@ -87,6 +94,7 @@ public class BigBangServletContextListener implements ServletContextListener {
       }else{
     	  storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
       }
+      
 
 	DataModel persistentData = storage.recommenderData();
 
@@ -133,8 +141,43 @@ public class BigBangServletContextListener implements ServletContextListener {
 
         log.info("Created ItemBasedRecommender [{}] using similarity [{}] and [{}] similar items per item",
             new Object[] { name, itembasedConf.getSimilarityClass(), itembasedConf.getSimilarItemsPerItem() });
-      }
+      }     
+     
+      for (StreamingKMeansClustererConfig streamingKMeansClustererConf : conf.getStreamingKMeansClusterer()) {
+      
+    	  String name = streamingKMeansClustererConf.getName();
+    	  
+          File modelFile = new File(conf.getModelDirectory(), name + ".model");
 
+          PersistenceStrategy persistence = new FilePersistenceStrategy(modelFile);
+
+          if (!modelFile.exists()) {
+            createEmptyFactorization(persistence);
+          }
+          StreamingKMeansClassifierModel model = new StreamingKMeansClassifierModel(conf.getStorageConfiguration()); 
+          StreamingKMeansClustererTrainer clusterer = new StreamingKMeansClustererTrainer( streamingKMeansClustererConf, model);
+          trainers.put(name,clusterer);
+          
+          StreamingKMeansClassifierRecommender recommender = new StreamingKMeansClassifierRecommender(model);
+          recommenders.put(name, recommender);
+          
+          String cronExpression = streamingKMeansClustererConf.getRetrainCronExpression();
+          if (cronExpression == null) {
+            scheduler.addRecommenderTrainingJob(name);
+          } else {
+            scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
+          }
+          
+          if (streamingKMeansClustererConf.getRetrainAfterPreferenceChanges() !=
+                  RecommenderConfig.DONT_RETRAIN_ON_PREFERENCE_CHANGES) {
+                preferenceChangeListener.addDelegate(new InMemoryPreferenceChangeListener(scheduler, name,
+                		streamingKMeansClustererConf.getRetrainAfterPreferenceChanges()));
+              }
+          
+          log.info("Created StreamingKMeansClusterer [{}] with [{}] minclusters and [{}] cutoff distance",
+              new Object[] { name, streamingKMeansClustererConf.getDesiredNumCluster(), streamingKMeansClustererConf.getDistanceCutoff()}); 
+      }
+   
       for (FactorizationbasedRecommenderConfig factorizationbasedConf : conf.getFactorizationbasedRecommenders()) {
 
         String name = factorizationbasedConf.getName();

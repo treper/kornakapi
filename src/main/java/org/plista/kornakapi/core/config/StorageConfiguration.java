@@ -22,6 +22,15 @@ public class StorageConfiguration {
   private String jdbcUrl;
   private String username;
   private String password;
+  private int minNumUserRatings;
+	
+  public int getMinNumUserRatings(){
+	return minNumUserRatings;
+  }
+  public void setMinNumUserRating(int minNumUserRatings){
+	  this.minNumUserRatings = minNumUserRatings;
+  }
+
 
   public String getJdbcDriverClass() {
     return jdbcDriverClass;

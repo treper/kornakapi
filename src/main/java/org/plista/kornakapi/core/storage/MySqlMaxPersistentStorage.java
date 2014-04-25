@@ -21,6 +21,7 @@ import org.apache.mahout.common.IOUtils;
 import org.plista.kornakapi.core.config.StorageConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,22 +36,18 @@ public class MySqlMaxPersistentStorage extends MySqlStorage implements Storage {
   private static final String IMPORT_QUERY_MAX =
 	      "INSERT INTO taste_preferences (user_id, item_id, preference) VALUES (?, ?, ?) " +
 	      "ON DUPLICATE KEY UPDATE preference = GREATEST(preference, VALUES(preference))";
-
-
-
+ 
   private static final Logger log = LoggerFactory.getLogger(MySqlStorage.class);
-
+   
   public MySqlMaxPersistentStorage(StorageConfiguration storageConf) {
 	super(storageConf);
+
   }
-
-
 
   @Override
   public void setPreference(long userID, long itemID, float value) throws IOException {
 	  Connection conn = null;
 	    PreparedStatement stmt = null;
-
 	    try {
 	      conn = dataSource.getConnection();
 	      stmt = conn.prepareStatement(IMPORT_QUERY_MAX);

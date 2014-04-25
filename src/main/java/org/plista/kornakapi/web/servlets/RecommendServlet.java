@@ -110,8 +110,10 @@ public class RecommendServlet extends BaseServlet {
 	        log.info("Unknown Item: {}", e.getMessage());
 	    }
     }catch (TasteException e) {
+	    if (log.isInfoEnabled()) {
+	        log.info("Unknown Item: {}", e.getMessage());
+	    }
         throw new ServletException(e);
       }
-
   }
 }

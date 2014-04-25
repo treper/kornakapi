@@ -16,7 +16,6 @@
 package org.plista.kornakapi.web;
 
 import com.google.common.base.Preconditions;
-import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.plista.kornakapi.KornakapiRecommender;
 import org.plista.kornakapi.core.config.Configuration;
 import org.plista.kornakapi.core.storage.Storage;
