@@ -37,75 +37,12 @@ public class MySqlMaxPersistentStorage extends MySqlStorage implements Storage {
 	      "INSERT INTO taste_preferences (user_id, item_id, preference) VALUES (?, ?, ?) " +
 	      "ON DUPLICATE KEY UPDATE preference = GREATEST(preference, VALUES(preference))";
  
-  private static final String RATING_DECAY = "ALTER EVENT decay ON SCHEDULE EVERY 2 HOUR DO UPDATE taste_preferences SET preference = preference - ?";
-  
-  private static final String EVENT = "CREATE EVENT IF NOT EXISTS decay ON SCHEDULE EVERY 2 HOUR DO UPDATE taste_preferences SET preference = preference - 0";
-
   private static final Logger log = LoggerFactory.getLogger(MySqlStorage.class);
-  
-  public MySqlMaxPersistentStorage(StorageConfiguration storageConf){
-	  this(storageConf, 0);
-  }
-  
-  public MySqlMaxPersistentStorage(StorageConfiguration storageConf, float ratingDecay) {
+   
+  public MySqlMaxPersistentStorage(StorageConfiguration storageConf) {
 	super(storageConf);
-	setStorageRatingDecay(ratingDecay);	
-  }
 
- private void initEvent(){
-	 Connection conn = null;
-	 PreparedStatement stmt = null;
-	 try{
-		 conn = dataSource.getConnection();
-		 stmt = conn.prepareStatement(EVENT);
-		 stmt.execute();
-	 }catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-		      IOUtils.quietClose(stmt);
-		      IOUtils.quietClose(conn);
-		}
- }
- 
- private void setStorageRatingDecay(float ratingDecay){
-	 initEvent();
-	 if(ratingDecay > 0){
-		 Connection conn = null;
-		 PreparedStatement stmt = null;
-		 PreparedStatement stmt2 = null;	 
-		 try {
-			conn = dataSource.getConnection();
-			stmt = conn.prepareStatement(RATING_DECAY);
-			stmt.setFloat(1, ratingDecay);
-			stmt.execute();
-			stmt2 = conn.prepareStatement("set global  event_scheduler = on");
-			stmt2.execute();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-		      IOUtils.quietClose(stmt);
-		      IOUtils.quietClose(stmt2);
-		      IOUtils.quietClose(conn);
-		}
-	 }else{
-		 Connection conn = null;
-		 PreparedStatement stmt = null;
-		 
-		 try {
-			conn = dataSource.getConnection();
-			stmt = conn.prepareStatement("set global  event_scheduler = off");
-			stmt.execute();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-		      IOUtils.quietClose(stmt);
-		      IOUtils.quietClose(conn);
-		}
-	 }
- }
+  }
 
   @Override
   public void setPreference(long userID, long itemID, float value) throws IOException {

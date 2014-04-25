@@ -86,12 +86,11 @@ public class BigBangServletContextListener implements ServletContextListener {
       Configuration conf = Configuration.fromXML(Files.toString(configFile, Charsets.UTF_8));
 
       Preconditions.checkState(conf.getNumProcessorsForTraining() > 0, "need at least one processor for training!");
-      
-      float ratingDecay = conf.getRatingDecay();
+
       
       Storage storage;
       if(conf.getMaxPersistence()){
-    	  storage = new CandidateCacheStorageDecorator(new MySqlMaxPersistentStorage(conf.getStorageConfiguration(), ratingDecay));
+    	  storage = new CandidateCacheStorageDecorator(new MySqlMaxPersistentStorage(conf.getStorageConfiguration()));
       }else{
     	  storage = new CandidateCacheStorageDecorator(new MySqlStorage(conf.getStorageConfiguration()));
       }

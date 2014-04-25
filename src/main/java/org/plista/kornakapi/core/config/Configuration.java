@@ -101,7 +101,4 @@ public class Configuration {
   public boolean getMaxPersistence(){
 	  return maxPersistence;
   }
-  public float getRatingDecay(){
-	  return ratingDecay;
-  }
 }
