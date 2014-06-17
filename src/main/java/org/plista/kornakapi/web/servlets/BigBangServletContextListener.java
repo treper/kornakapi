@@ -64,6 +64,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /** servlet context listener to initialize/shut down the application */
+//模型初始化
 public class BigBangServletContextListener implements ServletContextListener {
 
   private static final String CONFIG_PROPERTY = "kornakapi.conf";
@@ -96,19 +97,19 @@ public class BigBangServletContextListener implements ServletContextListener {
       }
       
 
-	DataModel persistentData = storage.recommenderData();
+	DataModel persistentData = storage.recommenderData();//mysql storage
 
       Map<String, KornakapiRecommender> recommenders = Maps.newHashMap();
       Map<String, Trainer> trainers = Maps.newHashMap();
 
-      TrainingScheduler scheduler = new TrainingScheduler();
+      TrainingScheduler scheduler = new TrainingScheduler();//quatz任务调度器
       DelegatingPreferenceChangeListener preferenceChangeListener = new DelegatingPreferenceChangeListener();
 
       for (ItembasedRecommenderConfig itembasedConf : conf.getItembasedRecommenders()) {
 
         String name = itembasedConf.getName();
 
-        File modelFile = modelFile(conf, name);
+        File modelFile = modelFile(conf, name);//模型文件格式为name.model
 
         if (!modelFile.exists()) {
           boolean created = modelFile.createNewFile();
@@ -117,19 +118,23 @@ public class BigBangServletContextListener implements ServletContextListener {
           }
         }
 
+          //文件记录的item相似度,mahout里的GenericItemSimilarity用了一个嵌套map记录相似度,并有item相似的index,相互index
         ItemSimilarity itemSimilarity = new FileItemSimilarity(modelFile);
         AllSimilarItemsCandidateItemsStrategy allSimilarItemsStrategy =
             new AllSimilarItemsCandidateItemsStrategy(itemSimilarity);
+          //初始化一个recommender
         KornakapiRecommender recommender = new ItemSimilarityBasedRecommender(persistentData, itemSimilarity,
             allSimilarItemsStrategy, allSimilarItemsStrategy);
 
+          //添加recommender索引
         recommenders.put(name, recommender);
+          //添加训练任务
         trainers.put(name, new MultithreadedItembasedInMemoryTrainer(itembasedConf));
 
         String cronExpression = itembasedConf.getRetrainCronExpression();
         if (cronExpression == null) {
           scheduler.addRecommenderTrainingJob(name);
-        } else {
+        } else {//添加定时训练任务
           scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
         }
 
@@ -164,7 +169,7 @@ public class BigBangServletContextListener implements ServletContextListener {
           String cronExpression = streamingKMeansClustererConf.getRetrainCronExpression();
           if (cronExpression == null) {
             scheduler.addRecommenderTrainingJob(name);
-          } else {
+          } else {//添加定时训练任务
             scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
           }
           
@@ -202,7 +207,7 @@ public class BigBangServletContextListener implements ServletContextListener {
         String cronExpression = factorizationbasedConf.getRetrainCronExpression();
         if (cronExpression == null) {
           scheduler.addRecommenderTrainingJob(name);
-        } else {
+        } else {//添加定时训练任务
           scheduler.addRecommenderTrainingJobWithCronSchedule(name, cronExpression);
         }
 
@@ -217,7 +222,7 @@ public class BigBangServletContextListener implements ServletContextListener {
                 factorizationbasedConf.getNumberOfIterations() });
       }
 
-      Components.init(conf, storage, recommenders, trainers, scheduler, preferenceChangeListener);
+      Components.init(conf, storage, recommenders, trainers, scheduler, preferenceChangeListener);//singleton
 
       scheduler.start();
 

@@ -77,6 +77,7 @@ public class MultithreadedItembasedInMemoryTrainer extends AbstractTrainer {
       BlockingQueue<String> output = new LinkedBlockingQueue<String>();
 
       AtomicInteger numActiveWorkers = new AtomicInteger(numProcessors);
+      //将之前的分批的item list,并行计算item相似度
       for (int n = 0; n < numProcessors; n++) {
         executorService.execute(new SimilarItemsWorker(n, itemsIDsToProcess, output, trainer,
             conf.getSimilarItemsPerItem(), numActiveWorkers));

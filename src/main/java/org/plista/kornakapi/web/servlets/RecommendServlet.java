@@ -53,7 +53,7 @@ public class RecommendServlet extends BaseServlet {
       FastIDSet candidates = storage().getCandidates(label);
       rescorer = new FixedCandidatesIDRescorer(candidates);
     }
-
+//选择item based或user based等模型
     KornakapiRecommender recommender = recommender(recommenderName);
 
     try {
